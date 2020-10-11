@@ -47,3 +47,29 @@ func (q *questionRepository) fetch(ctx context.Context, query string, args ...in
 
 	return result, nil
 }
+
+func (q *questionRepository) Fetch(ctx context.Context) (res []domain.Question, err error) {
+	query := `SELECT id, nim, name, semester FROM mahasiswa`
+
+	res, err := q.fetch(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+func (q *questionRepository) Get(ctx context.Context, id int64) (res domain.Question, err error) {
+	query := `SELECT id, nim, name, semester FROM mahasiswa WHERE id = ?`
+
+	list, err := q.fetch(ctx, query, id)
+	if err != nil {
+		return domain.Question{}, err
+	}
+
+	if len(list) > 0 {
+		return list[0], nil
+	}
+
+	return domain.Question{}, errors.New("Item not found")
+}
