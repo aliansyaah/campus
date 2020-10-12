@@ -4,13 +4,19 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
+	// "net/http"
 	"net/url"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/julienschmidt/httprouter"
+	// "github.com/julienschmidt/httprouter"
+	"github.com/labstack/echo"
 	"github.com/spf13/viper"
+
+	mhsRepo "campus/repository"
+	mhsUsecase "campus/usecase"
+	mhsDeliv "campus/delivery"
+	mhsDelivMiddleware "campus/delivery/middleware"
 )
 
 func init() {
@@ -40,7 +46,8 @@ func main() {
 	val.Add("loc", "Asia/Jakarta")
 
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
-	dbConn, err := sql.Open("mysql", dsn)
+	// dbConn, err := sql.Open("mysql", dsn)
+	dbConn, err := sql.Open(`mysql`, dsn)
 
 	if err != nil {
 		log.Fatal(err)
@@ -58,18 +65,25 @@ func main() {
 		}
 	}()
 
-	timeout := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	router := httprouter.New()
+	e := echo.New()
+	middL := mhsDelivMiddleware.InitMiddleware()
+	e.Use(middL.CORS)
+
+	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
+	// router := httprouter.New()
 
 	/* Layer Repository */
-	mr := mhsRepo.NewMahasiswaRepository(dbconn)
+	mr := mhsRepo.NewMahasiswaRepository(dbConn)
 
 	/* Layer Usecase */
-	mu := mhsUsecase.NewMahasiswaUsecase(mr, timeout)
+	mu := mhsUsecase.NewMahasiswaUsecase(mr, timeoutContext)
 
 	/* Layer Delivery */
-	md.NewMahasiswaHandler(router, mu)
+	mhsDeliv.NewMahasiswaHandler(e, mu)
+	// mhsDeliv.NewMahasiswaHandler(router, mu)
 
-	router.ServeFiles("/static/*filepath", http.Dir("assets"))
-	log.Fatal(http.ListenAndServe(viper.GetString("server.address"), router))
+	log.Fatal(e.Start(viper.GetString("server.address")))
+
+	// router.ServeFiles("/static/*filepath", http.Dir("assets"))
+	// log.Fatal(http.ListenAndServe(viper.GetString("server.address"), router))
 }

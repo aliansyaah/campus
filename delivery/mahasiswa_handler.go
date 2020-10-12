@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	validator "gopkg.in/go-playground/validator.v9"
+	// validator "gopkg.in/go-playground/validator.v9"
 
 	// "path"
 	// "strings"
@@ -30,7 +30,8 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 		MUsecase: us,
 	}
 
-	h.GET("/", handler.Index)
+	e.GET("/", handler.FetchMahasiswa)
+	// e.GET("/:id", handler.GetByID)
 }
 
 func (m *MahasiswaHandler) FetchMahasiswa(c echo.Context) error {
@@ -39,13 +40,31 @@ func (m *MahasiswaHandler) FetchMahasiswa(c echo.Context) error {
 	cursor := c.QueryParam("cursor")
 	ctx := c.Request().Context()
 
-	listMhs, nextCursor, err := a.MUsecase.Fetch(ctx, cursor, int64(num))
+	listMhs, nextCursor, err := m.MUsecase.Fetch(ctx, cursor, int64(num))
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, listMhs)
+}
+
+func getStatusCode(err error) int {
+	if err == nil {
+		return http.StatusOK
+	}
+
+	logrus.Error(err)
+	switch err {
+	case domain.ErrInternalServerError:
+		return http.StatusInternalServerError
+	case domain.ErrNotFound:
+		return http.StatusNotFound
+	case domain.ErrConflict:
+		return http.StatusConflict
+	default:
+		return http.StatusInternalServerError
+	}
 }
 
 /*func (h *MahasiswaHandler) Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
