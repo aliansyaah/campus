@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	// "campus/repository"
 	"campus/domain"
+	"fmt"
 )
 
 type mahasiswaRepository struct {
@@ -31,51 +32,72 @@ func (q *mahasiswaRepository) fetch(ctx context.Context, query string, args ...i
 		}
 	}()
 
-	result = make([]domain.Mahasiswa, 0)
+	// Membuat slice baru dari awal
+	// make(type slice, panjang, kapasitas)
+	result = make([]domain.Mahasiswa, 0)	// tipe = slice domain.Mahasiswa
+
+	// fmt.Println("Looping:")
+
+	// Looping rows hasil query
 	for rows.Next() {
-		toBeAdded := domain.Mahasiswa{}
+		toBeAdded := domain.Mahasiswa{}		// struct mahasiswa pada layer domain/model
+		// fmt.Println("toBeAdded: ", toBeAdded)
 		// mhsID := int64(0)
+
 		err = rows.Scan(
 			&toBeAdded.ID,
 			&toBeAdded.Nim,
 			// &mhsID,
 			&toBeAdded.Name,
 			&toBeAdded.Semester,
+			&toBeAdded.CreatedAt,
+			&toBeAdded.UpdatedAt,
 		)
+		// fmt.Println("err: ", err)
 
 		if err != nil {
 			logrus.Error(err)
 			return nil, err
 		}
+		// fmt.Println("toBeAdded 2: ", toBeAdded)
 		
-
+		// Jika tdk error, masukkan hasil ke slice result
 		result = append(result, toBeAdded)
+		// fmt.Println("result: ", result)
+		// fmt.Println()
 	}
 
 	return result, nil
 }
 
 func (m *mahasiswaRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Mahasiswa, nextCursor string, err error) {
-	query := `SELECT id, nim, name, semester 
+	// Query fetch mahasiswa
+	query := `SELECT id, nim, name, semester, created_at, updated_at
 				FROM mahasiswa
 				WHERE created_at > ?
 				ORDER BY created_at LIMIT ?`
 
-	// decodedCursor, err := repository.DecodeCursor(cursor)
+	// Decoding cursor
 	decodedCursor, err := DecodeCursor(cursor)
+	// decodedCursor, err := repository.DecodeCursor(cursor)
 	if err != nil && cursor != "" {
 		return nil, "", domain.ErrBadParamInput
 	}
 
+	// Panggil fungsi fetch
 	res, err = m.fetch(ctx, query, decodedCursor, num)
 	if err != nil {
 		return nil, "", err
 	}
+	// fmt.Println(res)
+	// fmt.Println(num)
 
+	// Jika jumlah row result = query params num
 	if len(res) == int(num) {
-		// nextCursor = repository.EncodeCursor(res[len(res)-1].CreatedAt)
 		nextCursor = EncodeCursor(res[len(res)-1].CreatedAt)
+		// nextCursor = repository.EncodeCursor(res[len(res)-1].CreatedAt)
 	}
+	// fmt.Println(nextCursor)
 
 	return
 }

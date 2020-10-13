@@ -1,14 +1,14 @@
 {
     "debug": true,
     "server": {
-        "address": ":9000"
+        "address": ":8080"
     },
     "context": {
         "timeout": 2
     },
     "database": {
         "host": "localhost",
-        "post": "3306",
+        "port": "3306",
         "user": "root",
         "pass": "ali123",
         "name": "campus"

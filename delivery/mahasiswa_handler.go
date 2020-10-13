@@ -35,11 +35,12 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 }
 
 func (m *MahasiswaHandler) FetchMahasiswa(c echo.Context) error {
-	numS := c.QueryParam("num")
-	num, _ := strconv.Atoi(numS)
-	cursor := c.QueryParam("cursor")
+	numS := c.QueryParam("num")			// ambil param dgn key "num"
+	num, _ := strconv.Atoi(numS)		// convert string to int
+	cursor := c.QueryParam("cursor")	// ambil param dgn key "cursor"
 	ctx := c.Request().Context()
 
+	// Panggil fungsi Fetch di usecase mahasiswa
 	listMhs, nextCursor, err := m.MUsecase.Fetch(ctx, cursor, int64(num))
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})

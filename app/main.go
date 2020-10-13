@@ -19,6 +19,7 @@ import (
 	mhsDelivMiddleware "campus/delivery/middleware"
 )
 
+// Init config with viper
 func init() {
 	viper.SetConfigFile("../config.json")
 	err := viper.ReadInConfig()
@@ -32,12 +33,19 @@ func init() {
 }
 
 func main() {
-	// fmt.Println("hello world")
+	// Read database config from config.json
 	dbHost := viper.GetString("database.host")
 	dbPort := viper.GetString("database.port")
 	dbUser := viper.GetString("database.user")
 	dbPass := viper.GetString("database.pass")
 	dbName := viper.GetString("database.name")
+
+	// Without viper
+	// dbHost := "localhost"
+	// dbPort := "3306"
+	// dbUser := "root"
+	// dbPass := "ali123"
+	// dbName := "campus"
 
 	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 
@@ -46,8 +54,7 @@ func main() {
 	val.Add("loc", "Asia/Jakarta")
 
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
-	// dbConn, err := sql.Open("mysql", dsn)
-	dbConn, err := sql.Open(`mysql`, dsn)
+	dbConn, err := sql.Open("mysql", dsn)
 
 	if err != nil {
 		log.Fatal(err)
@@ -69,8 +76,9 @@ func main() {
 	middL := mhsDelivMiddleware.InitMiddleware()
 	e.Use(middL.CORS)
 
-	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	// router := httprouter.New()
+	// Read context config from config.json
+	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second	// with viper
+	// timeoutContext := time.Duration(30) * time.Second	// without viper
 
 	/* Layer Repository */
 	mr := mhsRepo.NewMahasiswaRepository(dbConn)
@@ -80,10 +88,8 @@ func main() {
 
 	/* Layer Delivery */
 	mhsDeliv.NewMahasiswaHandler(e, mu)
-	// mhsDeliv.NewMahasiswaHandler(router, mu)
 
-	log.Fatal(e.Start(viper.GetString("server.address")))
-
-	// router.ServeFiles("/static/*filepath", http.Dir("assets"))
-	// log.Fatal(http.ListenAndServe(viper.GetString("server.address"), router))
+	// Read server address config from config.json
+	log.Fatal(e.Start(viper.GetString("server.address")))	// with viper
+	// log.Fatal(e.Start(":8080"))		// without viper
 }
