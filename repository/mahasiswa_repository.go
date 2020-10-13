@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	// "campus/repository"
 	"campus/domain"
-	"fmt"
+	// "fmt"
 )
 
 type mahasiswaRepository struct {
@@ -103,7 +103,7 @@ func (m *mahasiswaRepository) Fetch(ctx context.Context, cursor string, num int6
 }
 
 func (m *mahasiswaRepository) GetByID(ctx context.Context, id int64) (res domain.Mahasiswa, err error) {
-	query := `SELECT id, nim, name, semester 
+	query := `SELECT id, nim, name, semester, created_at, updated_at
 				FROM mahasiswa 
 				WHERE id = ?`
 

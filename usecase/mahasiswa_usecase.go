@@ -38,3 +38,15 @@ func (m *mahasiswaUsecase) Fetch(c context.Context, cursor string, num int64) (r
 	}
 	return
 }
+
+func (m *mahasiswaUsecase) GetByID(c context.Context, id int64) (res domain.Mahasiswa, err error) {
+	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
+	defer cancel()
+
+	res, err = m.mahasiswaRepo.GetByID(ctx, id)
+	if err != nil {
+		return 
+	}
+
+	return
+}

@@ -30,10 +30,11 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 		MUsecase: us,
 	}
 
-	e.GET("/", handler.FetchMahasiswa)
-	// e.GET("/:id", handler.GetByID)
+	e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
+	e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
 }
 
+// FetchMahasiswa will fetch the mahasiswa based on given params
 func (m *MahasiswaHandler) FetchMahasiswa(c echo.Context) error {
 	numS := c.QueryParam("num")			// ambil param dgn key "num"
 	num, _ := strconv.Atoi(numS)		// convert string to int
@@ -48,6 +49,23 @@ func (m *MahasiswaHandler) FetchMahasiswa(c echo.Context) error {
 
 	c.Response().Header().Set(`X-Cursor`, nextCursor)
 	return c.JSON(http.StatusOK, listMhs)
+}
+
+func (m *MahasiswaHandler) GetByID(c echo.Context) error {
+	idP, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+
+	id := int64(idP)
+	ctx := c.Request().Context()
+
+	art, err := m.MUsecase.GetByID(ctx, id)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, art)
 }
 
 func getStatusCode(err error) int {
