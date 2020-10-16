@@ -50,3 +50,28 @@ func (m *mahasiswaUsecase) GetByID(c context.Context, id int64) (res domain.Maha
 
 	return
 }
+
+func (m *mahasiswaUsecase) GetByNIM(c context.Context, nim int32) (res domain.Mahasiswa, err error) {
+	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
+	defer cancel()
+
+	res, err = m.mahasiswaRepo.GetByNIM(ctx, nim)
+	if err != nil {
+		return 
+	}
+
+	return
+}
+
+func (m *mahasiswaUsecase) Store(c context.Context, dm *domain.Mahasiswa) (err error) {
+	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
+	defer cancel()
+	
+	existedMahasiswa, _ := m.GetByNIM(ctx, dm.Nim)
+	if existedMahasiswa != (domain.Mahasiswa{}) {
+		return domain.ErrConflict
+	}
+
+	err = m.mahasiswaRepo.Store(ctx, dm)
+	return
+}

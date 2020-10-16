@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	// validator "gopkg.in/go-playground/validator.v9"
+	validator "gopkg.in/go-playground/validator.v9"
 
 	// "path"
 	// "strings"
@@ -32,6 +32,7 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 
 	e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
 	e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
+	e.POST("/", handler.Store)
 }
 
 // FetchMahasiswa will fetch the mahasiswa based on given params
@@ -66,6 +67,36 @@ func (m *MahasiswaHandler) GetByID(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, art)
+}
+
+func isRequestValid(m *domain.Mahasiswa) (bool, error) {
+	validate := validator.New()
+	err := validate.Struct(m)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
+	var mahasiswa domain.Mahasiswa
+	err = c.Bind(&mahasiswa)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	var ok bool
+	if ok, err = isRequestValid(&mahasiswa); !ok {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	ctx := c.Request().Context()
+	err = m.MUsecase.Store(ctx, &mahasiswa)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusCreated, mahasiswa)
 }
 
 func getStatusCode(err error) int {

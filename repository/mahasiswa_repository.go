@@ -8,6 +8,7 @@ import (
 	// "campus/repository"
 	"campus/domain"
 	// "fmt"
+	"time"
 )
 
 type mahasiswaRepository struct {
@@ -118,5 +119,47 @@ func (m *mahasiswaRepository) GetByID(ctx context.Context, id int64) (res domain
 		return res, domain.ErrNotFound
 	}
 
+	return
+}
+
+func (m *mahasiswaRepository) GetByNIM(ctx context.Context, nim int32) (res domain.Mahasiswa, err error) {
+	query := `SELECT id, nim, name, semester, created_at, updated_at
+				FROM mahasiswa 
+				WHERE nim = ?`
+
+	list, err := m.fetch(ctx, query, nim)
+	if err != nil {
+		return 
+	}
+
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
+
+	return
+}
+
+func (m *mahasiswaRepository) Store(ctx context.Context, dm *domain.Mahasiswa) (err error) {
+	// Insert datetime bisa pakai "time.Now()" atau langsung di query pakai "now()"
+	// query := `INSERT mahasiswa SET nim=?, name=?, semester=?, created_at=?, updated_at=now()`
+	query := `INSERT mahasiswa SET nim=?, name=?, semester=?, created_at=?`
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 
+	}
+
+	res, err := stmt.ExecContext(ctx, dm.Nim, dm.Name, dm.Semester, time.Now())
+	if err != nil {
+		return 
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return 
+	}
+
+	dm.ID = lastID
 	return
 }
