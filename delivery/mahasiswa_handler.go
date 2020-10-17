@@ -107,27 +107,23 @@ func validateSemester(c echo.Context) (sql.NullInt32, error) {
 
 func validateInput(c echo.Context, m domain.Mahasiswa) (domain.Mahasiswa, error) {
 	// var mahasiswa domain.Mahasiswa
-	var sem sql.NullInt32
+	var sem sql.NullInt32						// deklarasi var sem dgn tipe data NullInt32
 
-	reqSem := c.FormValue("semester")
-	// fmt.Println(reqSem)
-	if reqSem != "" {
-		fmt.Println("semester not empty")
+	reqSem := c.FormValue("semester")			// ambil request dgn nama "semester"
+	
+	if reqSem != "" {							// jika request "semester" tidak kosong
+		// fmt.Println("semester not empty")
 		if err := sem.Scan(reqSem); err != nil {
 			// panic(err)
-			// return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 			return m, err
 		}
 	}
 	// mahasiswa.Semester = sem
-	m.Semester = sem
+	m.Semester = sem 	// variabel "sem" dimasukkan ke property "Semester" pada struct "mahasiswa"
 
-	// fmt.Println(&mahasiswa)
-	// fmt.Println(mahasiswa.Semester)
 	// fmt.Printf("var semester = %T\n", semester)
 	// fmt.Printf("var mahasiswa.Semester = %T\n", mahasiswa.Semester)
 
-	// return true, nil
 	return m, nil
 }
 
@@ -138,8 +134,8 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
-	fmt.Println(&mahasiswa)
-	fmt.Println(mahasiswa.Semester)
+	// fmt.Println(&mahasiswa)
+	// fmt.Println(mahasiswa.Semester)
 
 	var ok bool
 	if ok, err = isRequestValid(&mahasiswa); !ok {
@@ -155,15 +151,16 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	// fmt.Println(&mahasiswa)
 	// fmt.Println(mahasiswa.Semester)
 
+	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
 	if mahasiswa, err = validateInput(c, mahasiswa); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	fmt.Println(&mahasiswa)
-	fmt.Println(mahasiswa)
+	// fmt.Println(&mahasiswa)
+	// fmt.Println(mahasiswa)
 
 	ctx := c.Request().Context()
 	err = m.MUsecase.Store(ctx, &mahasiswa)
-	fmt.Println(&mahasiswa)
+	// fmt.Println(&mahasiswa)
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})

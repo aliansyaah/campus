@@ -67,6 +67,7 @@ func (m *mahasiswaUsecase) Store(c context.Context, dm *domain.Mahasiswa) (err e
 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
 	defer cancel()
 	
+	// Cek jika ada ID yg sama
 	existedMahasiswa, _ := m.GetByNIM(ctx, dm.Nim)
 	if existedMahasiswa != (domain.Mahasiswa{}) {
 		return domain.ErrConflict

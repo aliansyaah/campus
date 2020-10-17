@@ -10,7 +10,7 @@ type Mahasiswa struct {
 	Nim int32
 	Name string
 	// Semester int32
-	Semester sql.NullInt32	`json:"semester"`						// sql.NullInt32 handle null possible values
+	Semester sql.NullInt32	`json:"semester"`		// sql.NullInt32 handle null possible values
 	CreatedAt time.Time `json:"created_at"`
 	// UpdatedAt time.Time `json:"updated_at"`
 	UpdatedAt mysql.NullTime `json:"updated_at"`	// mysql.NullTime handle null possible values

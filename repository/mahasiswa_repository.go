@@ -155,11 +155,11 @@ func (m *mahasiswaRepository) Store(ctx context.Context, dm *domain.Mahasiswa) (
 		return 
 	}
 
-	lastID, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()	// ambil id terakhir
 	if err != nil {
 		return 
 	}
 
-	dm.ID = lastID
+	dm.ID = lastID 		// property "ID" pada struct "mahasiswa" akan berisi ID terakhir
 	return
 }
