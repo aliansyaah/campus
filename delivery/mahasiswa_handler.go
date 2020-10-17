@@ -145,21 +145,6 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	if ok, err = isRequestValid(&mahasiswa); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	
-	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
-	// var semester sql.NullInt32
-	// sem := c.FormValue("semester")
-	// fmt.Println(sem)
-	// if sem != "" {
-	// 	fmt.Println("semester not empty")
-	// 	if err := semester.Scan(sem); err != nil {
-	// 		// panic(err)
-	// 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
-	// 	}
-	// }
-	// mahasiswa.Semester = semester
-	// fmt.Println(&mahasiswa)
-	// fmt.Println(mahasiswa.Semester)
 
 	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
 	// var sem sql.NullInt32

@@ -3,14 +3,14 @@ package domain
 import "context"
 import "time"
 import "github.com/go-sql-driver/mysql"
-// import "database/sql"
+import "database/sql"
 
 type Mahasiswa struct {
 	ID int64 `json:"id"`
 	Nim int32
 	Name string
-	Semester int32
-	// Semester sql.NullInt32							// sql.NullInt32 handle null possible values
+	// Semester int32
+	Semester sql.NullInt32	`json:"semester"`						// sql.NullInt32 handle null possible values
 	CreatedAt time.Time `json:"created_at"`
 	// UpdatedAt time.Time `json:"updated_at"`
 	UpdatedAt mysql.NullTime `json:"updated_at"`	// mysql.NullTime handle null possible values
