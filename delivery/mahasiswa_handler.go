@@ -80,7 +80,7 @@ func isRequestValid(m *domain.Mahasiswa) (bool, error) {
 	return true, nil
 }
 
-func validateInput(c echo.Context) (sql.NullInt32, error) {
+func validateSemester(c echo.Context) (sql.NullInt32, error) {
 	var mahasiswa domain.Mahasiswa
 	var sem sql.NullInt32
 
@@ -105,7 +105,7 @@ func validateInput(c echo.Context) (sql.NullInt32, error) {
 	return mahasiswa.Semester, nil
 }
 
-func validateInputNull(c echo.Context, m domain.Mahasiswa) (domain.Mahasiswa, error) {
+func validateInput(c echo.Context, m domain.Mahasiswa) (domain.Mahasiswa, error) {
 	// var mahasiswa domain.Mahasiswa
 	var sem sql.NullInt32
 
@@ -148,14 +148,14 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 
 	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
 	// var sem sql.NullInt32
-	// if sem, err = validateInput(c); err != nil {
+	// if sem, err = validateSemester(c); err != nil {
 	// 	return c.JSON(http.StatusBadRequest, err.Error())
 	// }
 	// mahasiswa.Semester = sem
 	// fmt.Println(&mahasiswa)
 	// fmt.Println(mahasiswa.Semester)
 
-	if mahasiswa, err = validateInputNull(c, mahasiswa); err != nil {
+	if mahasiswa, err = validateInput(c, mahasiswa); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	fmt.Println(&mahasiswa)
