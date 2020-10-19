@@ -113,6 +113,7 @@ func (m *mahasiswaRepository) GetByID(ctx context.Context, id int64) (res domain
 	if err != nil {
 		return domain.Mahasiswa{}, err
 	}
+	fmt.Println("GetByID: ", list)
 
 	if len(list) > 0 {
 		res = list[0]
@@ -182,10 +183,36 @@ func (m *mahasiswaRepository) Update(ctx context.Context, dm *domain.Mahasiswa) 
 	if err != nil {
 		return 
 	}
-	fmt.Println(affect)
+	fmt.Println("Row affected: ", affect)
 
 	if affect != 1 {
-		err = fmt.Errorf("weird behavior. Total affected: %d", affect)
+		err = fmt.Errorf("Weird behavior. Total affected: %d", affect)
+		return
+	}
+
+	return
+}
+
+func (m *mahasiswaRepository) Delete(ctx context.Context, id int64) (err error) {
+	query := `DELETE FROM mahasiswa WHERE id = ?`
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 
+	}
+
+	res, err := stmt.ExecContext(ctx, id)
+	if err != nil {
+		return 
+	}
+
+	affect, err := res.RowsAffected()
+	if err != nil {
+		return 
+	}
+	fmt.Println("Row affected: ", affect)
+
+	if affect != 1 {
+		err = fmt.Errorf("Weird behavior. Total affected: %d", affect)
 		return
 	}
 

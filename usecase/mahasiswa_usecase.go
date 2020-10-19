@@ -7,6 +7,7 @@ import (
 	// "github.com/sirupsen/logrus"
 	// "golang.org/x/sync/errgroup"
 	"campus/domain"
+	"fmt"
 )
 
 type mahasiswaUsecase struct {
@@ -89,4 +90,22 @@ func (m *mahasiswaUsecase) Update(c context.Context, dm *domain.Mahasiswa) (err 
 
 	// dm.UpdatedAt = time.Now()
 	return m.mahasiswaRepo.Update(ctx, dm)
+}
+
+func (m *mahasiswaUsecase) Delete(c context.Context, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
+	defer cancel()
+
+	existedMahasiswa, err := m.mahasiswaRepo.GetByID(ctx, id)
+	if err != nil {
+		return 
+	}
+	// fmt.Println(existedMahasiswa)
+	// fmt.Println(domain.Mahasiswa{})
+
+	if existedMahasiswa == (domain.Mahasiswa{}) {
+		return domain.ErrNotFound
+	}
+
+	return m.mahasiswaRepo.Delete(ctx, id)
 }

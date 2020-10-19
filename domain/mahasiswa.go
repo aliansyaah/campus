@@ -24,6 +24,7 @@ type MahasiswaUsecase interface {
 	// Store(context.Context, *Mahasiswa)
 	Store(ctx context.Context, m *Mahasiswa) error
 	Update(ctx context.Context, m *Mahasiswa) error
+	Delete(ctx context.Context, id int64) error
 }
 
 // MahasiswaRepository
@@ -33,4 +34,5 @@ type MahasiswaRepository interface {
 	GetByNIM(ctx context.Context, nim int32) (Mahasiswa, error)
 	Store(ctx context.Context, m *Mahasiswa) error
 	Update(ctx context.Context, m *Mahasiswa) error
+	Delete(ctx context.Context, id int64) error
 }

@@ -37,6 +37,7 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 	e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
 	e.POST("/", handler.Store)
 	e.PUT("/", handler.Update)
+	e.DELETE("/:id", handler.Delete)	// http://localhost:8080/8
 }
 
 // FetchMahasiswa will fetch the mahasiswa based on given params
@@ -178,7 +179,7 @@ func (m *MahasiswaHandler) Update(c echo.Context) (err error) {
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
-	fmt.Println(&mahasiswa)
+	// fmt.Println(&mahasiswa)
 	// fmt.Println(mahasiswa.Semester)
 
 	var ok bool
@@ -190,19 +191,37 @@ func (m *MahasiswaHandler) Update(c echo.Context) (err error) {
 	if mahasiswa, err = validateInput(c, mahasiswa); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	fmt.Println(&mahasiswa)
+	// fmt.Println(&mahasiswa)
 	// fmt.Println(mahasiswa)
 	// os.Exit(1)
 
 	ctx := c.Request().Context()
 	err = m.MUsecase.Update(ctx, &mahasiswa)
-	fmt.Println(&mahasiswa)
+	// fmt.Println(&mahasiswa)
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
 	return c.JSON(http.StatusCreated, mahasiswa)
+}
+
+func (m *MahasiswaHandler) Delete(c echo.Context) error {
+	idP, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+
+	id := int64(idP)
+	ctx := c.Request().Context()
+
+	err = m.MUsecase.Delete(ctx, id)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	fmt.Println(&m)
+
+	return c.NoContent(http.StatusNoContent)
 }
 
 func getStatusCode(err error) int {
