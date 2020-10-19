@@ -67,7 +67,7 @@ func (m *mahasiswaUsecase) Store(c context.Context, dm *domain.Mahasiswa) (err e
 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
 	defer cancel()
 	
-	// Cek jika ada ID yg sama
+	// Cek jika ada NIM yg sama
 	existedMahasiswa, _ := m.GetByNIM(ctx, dm.Nim)
 	if existedMahasiswa != (domain.Mahasiswa{}) {
 		return domain.ErrConflict
@@ -75,4 +75,18 @@ func (m *mahasiswaUsecase) Store(c context.Context, dm *domain.Mahasiswa) (err e
 
 	err = m.mahasiswaRepo.Store(ctx, dm)
 	return
+}
+
+func (m *mahasiswaUsecase) Update(c context.Context, dm *domain.Mahasiswa) (err error) {
+	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
+	defer cancel()
+
+	// Cek jika ada NIM yg sama
+	// existedMahasiswa, _ := m.GetByNIM(ctx, dm.Nim)
+	// if existedMahasiswa != (domain.Mahasiswa{}) {
+	// 	return domain.ErrConflict
+	// }
+
+	// dm.UpdatedAt = time.Now()
+	return m.mahasiswaRepo.Update(ctx, dm)
 }

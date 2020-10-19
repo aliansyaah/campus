@@ -15,6 +15,7 @@ import (
 	// "github.com/julienschmidt/httprouter"
 	"fmt"
 	"database/sql"
+	// "os"
 )
 
 // ResponseError represent the response error struct
@@ -35,6 +36,7 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 	e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
 	e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
 	e.POST("/", handler.Store)
+	e.PUT("/", handler.Update)
 }
 
 // FetchMahasiswa will fetch the mahasiswa based on given params
@@ -161,6 +163,40 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 	err = m.MUsecase.Store(ctx, &mahasiswa)
 	// fmt.Println(&mahasiswa)
+
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusCreated, mahasiswa)
+}
+
+func (m *MahasiswaHandler) Update(c echo.Context) (err error) {
+	var mahasiswa domain.Mahasiswa
+
+	err = c.Bind(&mahasiswa)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+	fmt.Println(&mahasiswa)
+	// fmt.Println(mahasiswa.Semester)
+
+	var ok bool
+	if ok, err = isRequestValid(&mahasiswa); !ok {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
+	if mahasiswa, err = validateInput(c, mahasiswa); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	fmt.Println(&mahasiswa)
+	// fmt.Println(mahasiswa)
+	// os.Exit(1)
+
+	ctx := c.Request().Context()
+	err = m.MUsecase.Update(ctx, &mahasiswa)
+	fmt.Println(&mahasiswa)
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})

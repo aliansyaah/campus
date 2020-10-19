@@ -21,7 +21,9 @@ type MahasiswaUsecase interface {
 	Fetch(ctx context.Context, cursor string, num int64) ([]Mahasiswa, string, error)
 	GetByID(ctx context.Context, id int64) (Mahasiswa, error)
 	GetByNIM(ctx context.Context, nim int32) (Mahasiswa, error)
-	Store(context.Context, *Mahasiswa) error
+	// Store(context.Context, *Mahasiswa)
+	Store(ctx context.Context, m *Mahasiswa) error
+	Update(ctx context.Context, m *Mahasiswa) error
 }
 
 // MahasiswaRepository
@@ -30,4 +32,5 @@ type MahasiswaRepository interface {
 	GetByID(ctx context.Context, id int64) (Mahasiswa, error)
 	GetByNIM(ctx context.Context, nim int32) (Mahasiswa, error)
 	Store(ctx context.Context, m *Mahasiswa) error
+	Update(ctx context.Context, m *Mahasiswa) error
 }

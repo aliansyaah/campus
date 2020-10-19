@@ -9,6 +9,7 @@ import (
 	"campus/domain"
 	// "fmt"
 	"time"
+	"fmt"
 )
 
 type mahasiswaRepository struct {
@@ -161,5 +162,32 @@ func (m *mahasiswaRepository) Store(ctx context.Context, dm *domain.Mahasiswa) (
 	}
 
 	dm.ID = lastID 		// property "ID" pada struct "mahasiswa" akan berisi ID terakhir
+	return
+}
+
+func (m *mahasiswaRepository) Update(ctx context.Context, dm *domain.Mahasiswa) (err error) {
+	query := `UPDATE mahasiswa SET nim=?, name=?, semester=?, updated_at=now() WHERE ID = ?`
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 
+	}
+
+	// res, err := stmt.ExecContext(ctx, dm.Nim, dm.Name, dm.Semester, dm.UpdatedAt, dm.ID)
+	res, err := stmt.ExecContext(ctx, dm.Nim, dm.Name, dm.Semester, dm.ID)
+	if err != nil {
+		return 
+	}
+
+	affect, err := res.RowsAffected()
+	if err != nil {
+		return 
+	}
+	fmt.Println(affect)
+
+	if affect != 1 {
+		err = fmt.Errorf("weird behavior. Total affected: %d", affect)
+		return
+	}
+
 	return
 }
