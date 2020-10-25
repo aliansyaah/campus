@@ -47,6 +47,7 @@ func main() {
 	// dbPass := "ali123"
 	// dbName := "campus"
 
+	// username:password@protocol(address:port)/dbname
 	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 
 	val := url.Values{}
@@ -60,6 +61,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// dbConn.Ping() untuk mengecek apakah "connection" & "dsn" sudah ok atau belum
 	err = dbConn.Ping()
 	if err != nil {
 		log.Fatal(err)

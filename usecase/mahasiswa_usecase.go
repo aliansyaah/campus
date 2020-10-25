@@ -7,7 +7,7 @@ import (
 	// "github.com/sirupsen/logrus"
 	// "golang.org/x/sync/errgroup"
 	"campus/domain"
-	"fmt"
+	// "fmt"
 )
 
 type mahasiswaUsecase struct {
