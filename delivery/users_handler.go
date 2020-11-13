@@ -3,12 +3,12 @@ package delivery
 import (
 	"net/http"
 	// "strconv"
-	// "campus/domain"
+	"campus/domain"
 	"campus/repository"
 
 	"github.com/labstack/echo"
-	// "github.com/sirupsen/logrus"
-	// validator "gopkg.in/go-playground/validator.v9"
+	"github.com/sirupsen/logrus"
+	validator "gopkg.in/go-playground/validator.v9"
 
 	// "path"
 	// "strings"
@@ -19,6 +19,14 @@ import (
 	// "os"
 )
 
+type ResponseError struct {
+	Message string `json:"message`
+}
+
+type UsersHandler struct {
+	UsersUC domain.UsersUsecase
+}
+
 func GenerateHashPassword(c echo.Context) error {
 	password := c.Param("password")
 	hash, _ := repository.HashPassword(password)
@@ -26,12 +34,48 @@ func GenerateHashPassword(c echo.Context) error {
 	return c.JSON(http.StatusOK, hash)
 }
 
-func NewUsersHandler(e *echo.Echo) {
-	// handler := &MahasiswaHandler{
-	// 	MUsecase: us,
-	// }
+func isRequestValid(m *domain.Users) (bool, error) {
+	validate := validator.New()
+	err := validate.Struct(m)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (u *UsersHandler) CheckLogin(c echo.Context) (err error) {
+	var users domain.Users
+
+	// username := c.FormValue("username")
+	// password := c.FormValue("password")
+	
+	err = c.Bind(&users)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	var ok bool
+	if ok, err = isRequestValid(&users); !ok {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	ctx := c.Request().Context()
+	err = u.UsersUC.CheckLogin(ctx, &users)
+
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusCreated, users)
+}
+
+func NewUsersHandler(e *echo.Echo, us domain.UsersUsecase) {
+	handler := &UsersHandler{
+		UsersUC: us,
+	}
 
 	e.GET("/generate-hash/:password", GenerateHashPassword)	// http://localhost:9000/generate-hash/
+	e.POST("/login", handler.CheckLogin)
 
 	// e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
 	// // e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/

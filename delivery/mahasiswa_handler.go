@@ -34,6 +34,7 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 	}
 
 	e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
+	// e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/
 	e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
 	e.POST("/", handler.Store)
 	e.PUT("/", handler.Update)

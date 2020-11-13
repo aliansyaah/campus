@@ -19,3 +19,7 @@ func (m *GoMiddleware) CORS(next echo.HandlerFunc) echo.HandlerFunc {
 func InitMiddleware() *GoMiddleware {
 	return &GoMiddleware{}
 }
+
+// var IsAuthenticated = middleware.JWTWithConfig(middleware.JWTConfig{
+// 	SigningKey: []byte("secret"),
+// })
