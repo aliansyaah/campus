@@ -90,6 +90,7 @@ func main() {
 
 	/* Layer Delivery */
 	mhsDeliv.NewMahasiswaHandler(e, mu)
+	mhsDeliv.NewUsersHandler(e)
 
 	// Read server address config from config.json
 	log.Fatal(e.Start(viper.GetString("server.address")))	// with viper
