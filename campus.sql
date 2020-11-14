@@ -14,8 +14,8 @@
  Date: 13/11/2020 16:48:02
 */
 
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
+-- SET NAMES utf8mb4;
+-- SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for dosen
@@ -28,32 +28,6 @@ CREATE TABLE `dosen`  (
   `created_at` datetime(0) NULL DEFAULT NULL,
   `updated_at` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`id_dosen`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Compact;
-
--- ----------------------------
--- Table structure for kelas
--- ----------------------------
-DROP TABLE IF EXISTS `kelas`;
-CREATE TABLE `kelas`  (
-  `id_kelas` int(255) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
-  `ruang_id` int(255) NULL DEFAULT NULL,
-  `mata_kuliah_id` int(255) NULL DEFAULT NULL,
-  `dosen_id` int(255) NULL DEFAULT NULL,
-  `mahasiswa_id` int(255) NULL DEFAULT NULL,
-  `created_by` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
-  `created_at` datetime(0) NULL DEFAULT NULL,
-  `updated_by` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
-  `updated_at` datetime(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`id_kelas`) USING BTREE,
-  INDEX `fk_ruang`(`ruang_id`) USING BTREE,
-  INDEX `fk_mata_kuliah`(`mata_kuliah_id`) USING BTREE,
-  INDEX `fk_dosen`(`dosen_id`) USING BTREE,
-  INDEX `fk_mahasiswa`(`mahasiswa_id`) USING BTREE,
-  CONSTRAINT `fk_ruang` FOREIGN KEY (`ruang_id`) REFERENCES `ruang` (`id_ruang`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_dosen` FOREIGN KEY (`dosen_id`) REFERENCES `dosen` (`id_dosen`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_mahasiswa` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_mata_kuliah` FOREIGN KEY (`mata_kuliah_id`) REFERENCES `mata_kuliah` (`id_mata_kuliah`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
@@ -127,3 +101,29 @@ CREATE TABLE `users`  (
 INSERT INTO `users` VALUES (1, 'aliansyah', 'ALI', '$2a$10$I3OnaJg9N.crtI5Zu8qlDe.aI/PhMLdMV8PClfgiYPBXZQvzD5yRO', '123');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ----------------------------
+-- Table structure for kelas
+-- ----------------------------
+DROP TABLE IF EXISTS `kelas`;
+CREATE TABLE `kelas`  (
+  `id_kelas` int(255) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+  `ruang_id` int(255) NULL DEFAULT NULL,
+  `mata_kuliah_id` int(255) NULL DEFAULT NULL,
+  `dosen_id` int(255) NULL DEFAULT NULL,
+  `mahasiswa_id` int(255) NULL DEFAULT NULL,
+  `created_by` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+  `created_at` datetime(0) NULL DEFAULT NULL,
+  `updated_by` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+  `updated_at` datetime(0) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_kelas`) USING BTREE,
+  INDEX `fk_ruang`(`ruang_id`) USING BTREE,
+  INDEX `fk_mata_kuliah`(`mata_kuliah_id`) USING BTREE,
+  INDEX `fk_dosen`(`dosen_id`) USING BTREE,
+  INDEX `fk_mahasiswa`(`mahasiswa_id`) USING BTREE,
+  CONSTRAINT `fk_ruang` FOREIGN KEY (`ruang_id`) REFERENCES `ruang` (`id_ruang`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_dosen` FOREIGN KEY (`dosen_id`) REFERENCES `dosen` (`id_dosen`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_mahasiswa` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_mata_kuliah` FOREIGN KEY (`mata_kuliah_id`) REFERENCES `mata_kuliah` (`id_mata_kuliah`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci ROW_FORMAT = Compact;
