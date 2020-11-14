@@ -84,13 +84,15 @@ func main() {
 
 	/* Layer Repository */
 	mr := mhsRepo.NewMahasiswaRepository(dbConn)
+	ur := mhsRepo.NewUsersRepository(dbConn)
 
 	/* Layer Usecase */
 	mu := mhsUsecase.NewMahasiswaUsecase(mr, timeoutContext)
+	uu := mhsUsecase.NewUsersUsecase(ur, timeoutContext)
 
 	/* Layer Delivery */
 	mhsDeliv.NewMahasiswaHandler(e, mu)
-	mhsDeliv.NewUsersHandler(e)
+	mhsDeliv.NewUsersHandler(e, uu)
 
 	// Read server address config from config.json
 	log.Fatal(e.Start(viper.GetString("server.address")))	// with viper

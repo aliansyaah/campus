@@ -117,6 +117,7 @@ func (m *mahasiswaRepository) GetByID(ctx context.Context, id int64) (res domain
 
 	if len(list) > 0 {
 		res = list[0]
+		// return res, nil
 	} else {
 		return res, domain.ErrNotFound
 	}

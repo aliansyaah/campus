@@ -7,24 +7,40 @@ import (
 	"campus/repository"
 
 	"github.com/labstack/echo"
-	"github.com/sirupsen/logrus"
+	// "github.com/sirupsen/logrus"
 	validator "gopkg.in/go-playground/validator.v9"
 
 	// "path"
 	// "strings"
 	// "text/template"
 	// "github.com/julienschmidt/httprouter"
-	// "fmt"
+	"fmt"
 	// "database/sql"
 	// "os"
 )
 
-type ResponseError struct {
-	Message string `json:"message`
-}
+// type ResponseError struct {
+// 	Message string `json:"message`
+// }
 
 type UsersHandler struct {
 	UsersUC domain.UsersUsecase
+}
+
+func NewUsersHandler(e *echo.Echo, us domain.UsersUsecase) {
+	handler := &UsersHandler{
+		UsersUC: us,
+	}
+
+	e.GET("/generate-hash/:password", GenerateHashPassword)	// http://localhost:9000/generate-hash/
+	e.POST("/login", handler.CheckLogin)
+
+	// e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
+	// // e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/
+	// e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
+	// e.POST("/", handler.Store)
+	// e.PUT("/", handler.Update)
+	// e.DELETE("/:id", handler.Delete)	// http://localhost:8080/8
 }
 
 func GenerateHashPassword(c echo.Context) error {
@@ -34,7 +50,7 @@ func GenerateHashPassword(c echo.Context) error {
 	return c.JSON(http.StatusOK, hash)
 }
 
-func isRequestValid(m *domain.Users) (bool, error) {
+func isRequestValid2(m *domain.Users) (bool, error) {
 	validate := validator.New()
 	err := validate.Struct(m)
 	if err != nil {
@@ -55,34 +71,20 @@ func (u *UsersHandler) CheckLogin(c echo.Context) (err error) {
 	}
 
 	var ok bool
-	if ok, err = isRequestValid(&users); !ok {
+	if ok, err = isRequestValid2(&users); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
-	err = u.UsersUC.CheckLogin(ctx, &users)
+	res, err := u.UsersUC.CheckLogin(ctx, &users)
+	fmt.Println("Handler res: ", res)
+	fmt.Println()
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, users)
-}
-
-func NewUsersHandler(e *echo.Echo, us domain.UsersUsecase) {
-	handler := &UsersHandler{
-		UsersUC: us,
-	}
-
-	e.GET("/generate-hash/:password", GenerateHashPassword)	// http://localhost:9000/generate-hash/
-	e.POST("/login", handler.CheckLogin)
-
-	// e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
-	// // e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/
-	// e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
-	// e.POST("/", handler.Store)
-	// e.PUT("/", handler.Update)
-	// e.DELETE("/:id", handler.Delete)	// http://localhost:8080/8
+	return c.JSON(http.StatusCreated, res)
 }
 
 // func getStatusCode(err error) int {

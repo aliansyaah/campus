@@ -1,6 +1,6 @@
 package domain
 
-// import "context"
+import "context"
 // import "time"
 // import "github.com/go-sql-driver/mysql"
 // import "database/sql"
@@ -10,11 +10,11 @@ type Users struct {
 	Username string `json:"username"`
 	Name string `json:"name"`
 	Password string `json:"password"`
-	DefaultPassword string `json:"password"`
+	DefaultPassword string `json:"default_password"`
 }
 
 type UsersUsecase interface {
-	CheckLogin(ctx context.Context, u *Users) error
+	CheckLogin(ctx context.Context, u *Users) (Users, error)
 
 	// Fetch(ctx context.Context, cursor string, num int64) ([]Mahasiswa, string, error)
 	// GetByID(ctx context.Context, id int64) (Mahasiswa, error)
@@ -25,7 +25,7 @@ type UsersUsecase interface {
 }
 
 type UsersRepository interface {
-	CheckLogin(ctx context.Context, u *Users) error
+	CheckLogin(ctx context.Context, u *Users) (Users, error)
 	
 	// Fetch(ctx context.Context, cursor string, num int64) (res []Mahasiswa, nextCursor string, err error)
 	// GetByID(ctx context.Context, id int64) (Mahasiswa, error)
