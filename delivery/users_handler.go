@@ -82,7 +82,8 @@ func (u *UsersHandler) CheckLogin(c echo.Context) (err error) {
 	fmt.Println()
 
 	if err != nil {
-		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		// return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), res)
 	}
 
 	return c.JSON(http.StatusOK, res)

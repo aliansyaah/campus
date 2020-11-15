@@ -13,8 +13,14 @@ type Users struct {
 	DefaultPassword string `json:"default_password"`
 }
 
+type Response struct {
+	Status bool `json:"status"`
+	Message string `json:"message"`
+	Data interface{} `json:"data"`
+}
+
 type UsersUsecase interface {
-	CheckLogin(ctx context.Context, u *Users) (Users, error)
+	CheckLogin(ctx context.Context, u *Users) (Response, error)
 
 	// Fetch(ctx context.Context, cursor string, num int64) ([]Mahasiswa, string, error)
 	// GetByID(ctx context.Context, id int64) (Mahasiswa, error)
