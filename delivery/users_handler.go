@@ -50,7 +50,7 @@ func GenerateHashPassword(c echo.Context) error {
 	return c.JSON(http.StatusOK, hash)
 }
 
-func isRequestValid2(m *domain.Users) (bool, error) {
+func isRequestUserValid(m *domain.Users) (bool, error) {
 	validate := validator.New()
 	err := validate.Struct(m)
 	if err != nil {
@@ -71,20 +71,21 @@ func (u *UsersHandler) CheckLogin(c echo.Context) (err error) {
 	}
 
 	var ok bool
-	if ok, err = isRequestValid2(&users); !ok {
+	if ok, err = isRequestUserValid(&users); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
 	res, err := u.UsersUC.CheckLogin(ctx, &users)
 	fmt.Println("Handler res: ", res)
+	fmt.Println("Handler err: ", err)
 	fmt.Println()
 
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, res)
+	return c.JSON(http.StatusOK, res)
 }
 
 // func getStatusCode(err error) int {

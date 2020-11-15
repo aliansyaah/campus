@@ -64,8 +64,8 @@ func (q *usersRepository) fetch(ctx context.Context, query string, args ...inter
 		
 		// Jika tdk error, masukkan hasil ke slice result
 		result = append(result, toBeAdded)
+		fmt.Println()
 		fmt.Println("result: ", result)
-		// fmt.Println()
 	}
 
 	return result, nil

@@ -6,6 +6,7 @@ import (
 	"campus/domain"
 	"campus/repository"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type usersUsecase struct {
@@ -24,19 +25,38 @@ func (u *usersUsecase) CheckLogin(c context.Context, du *domain.Users) (res doma
 	ctx, cancel := context.WithTimeout(c, u.contextTimeout)
 	defer cancel()
 
-	res, err = u.usersRepo.CheckLogin(ctx, du)
 	fmt.Println("Usecase domain users: ", du)
-	fmt.Println("Usecase res: ", res)
-	fmt.Println("Usecase err: ", err)
+
+	res, err = u.usersRepo.CheckLogin(ctx, du)
+	fmt.Println("Usecase CheckLogin res: ", res)
+	fmt.Println("Usecase CheckLogin err: ", err)
 	if err != nil {
 		return 
 	}
 
 	match, err := repository.CheckPasswordHash(du.Password, res.Password)
+	fmt.Println("Usecase CheckPasswordHash match: ", match)
+	fmt.Println("Usecase CheckPasswordHash err: ", err)
 	if !match {
 		fmt.Println("Hash and password doesn't match")
 		return res, err
 	}
+
+	// Generate token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	claims["username"] = du.Username
+	claims["level"] = "application"
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return res, err
+	}
+
+	fmt.Println("Token: ", t)
 
 	return
 }

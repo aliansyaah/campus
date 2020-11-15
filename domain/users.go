@@ -7,9 +7,9 @@ import "context"
 
 type Users struct {
 	IdUser int `json:"id_user"`
-	Username string `json:"username"`
+	Username string `json:"username" validate:"required"`
 	Name string `json:"name"`
-	Password string `json:"password"`
+	Password string `json:"password" validate:"required"`
 	DefaultPassword string `json:"default_password"`
 }
 
