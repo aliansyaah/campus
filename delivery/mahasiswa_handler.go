@@ -75,7 +75,7 @@ func (m *MahasiswaHandler) GetByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, art)
 }
 
-func isRequestValid(m *domain.Mahasiswa) (bool, error) {
+func isRequestMahasiswaValid(m *domain.Mahasiswa) (bool, error) {
 	validate := validator.New()
 	err := validate.Struct(m)
 	if err != nil {
@@ -109,7 +109,7 @@ func validateSemester(c echo.Context) (sql.NullInt32, error) {
 	return mahasiswa.Semester, nil
 }
 
-func validateInput(c echo.Context, m domain.Mahasiswa) (domain.Mahasiswa, error) {
+func validateMahasiswa(c echo.Context, m domain.Mahasiswa) (domain.Mahasiswa, error) {
 	// var mahasiswa domain.Mahasiswa
 	var sem sql.NullInt32						// deklarasi var sem dgn tipe data NullInt32
 
@@ -142,7 +142,7 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	// fmt.Println(mahasiswa.Semester)
 
 	var ok bool
-	if ok, err = isRequestValid(&mahasiswa); !ok {
+	if ok, err = isRequestMahasiswaValid(&mahasiswa); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
@@ -156,7 +156,7 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	// fmt.Println(mahasiswa.Semester)
 
 	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
-	if mahasiswa, err = validateInput(c, mahasiswa); err != nil {
+	if mahasiswa, err = validateMahasiswa(c, mahasiswa); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	// fmt.Println(&mahasiswa)
@@ -184,12 +184,12 @@ func (m *MahasiswaHandler) Update(c echo.Context) (err error) {
 	// fmt.Println(mahasiswa.Semester)
 
 	var ok bool
-	if ok, err = isRequestValid(&mahasiswa); !ok {
+	if ok, err = isRequestMahasiswaValid(&mahasiswa); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
-	if mahasiswa, err = validateInput(c, mahasiswa); err != nil {
+	if mahasiswa, err = validateMahasiswa(c, mahasiswa); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	// fmt.Println(&mahasiswa)
