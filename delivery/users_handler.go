@@ -88,21 +88,3 @@ func (u *UsersHandler) CheckLogin(c echo.Context) (err error) {
 
 	return c.JSON(http.StatusOK, res)
 }
-
-// func getStatusCode(err error) int {
-// 	if err == nil {
-// 		return http.StatusOK
-// 	}
-
-// 	logrus.Error(err)
-// 	switch err {
-// 	case domain.ErrInternalServerError:
-// 		return http.StatusInternalServerError
-// 	case domain.ErrNotFound:
-// 		return http.StatusNotFound
-// 	case domain.ErrConflict:
-// 		return http.StatusConflict
-// 	default:
-// 		return http.StatusInternalServerError
-// 	}
-// }

@@ -47,9 +47,9 @@ func (u *usersUsecase) CheckLogin(c context.Context, du *domain.Users) (res doma
 
 	fmt.Println("Usecase domain users: ", du)
 
-	result, err := u.usersRepo.CheckLogin(ctx, du)
-	fmt.Println("Usecase CheckLogin result: ", result)
-	fmt.Println("Usecase CheckLogin err: ", err)
+	result, err := u.usersRepo.GetByUsername(ctx, du)
+	fmt.Println("Usecase GetByUsername result: ", result)
+	fmt.Println("Usecase GetByUsername err: ", err)
 	if err != nil {
 		res.Status = false
 		res.Message = "Username not found"
@@ -63,23 +63,20 @@ func (u *usersUsecase) CheckLogin(c context.Context, du *domain.Users) (res doma
 		fmt.Println("Hash and password doesn't match")
 
 		res.Status = false
-		res.Message = "Hash and password doesn't match"
+		res.Message = "Wrong password"
 		// return res, err
 		return
 	}
 
 	token, err := GenerateToken(du)
 	if err != nil {
-		// res.Status = false
-		// res.Message = err
-		// res.Data = map[string]string{
-		// 	"token": token,
-		// }
-		return res, err
+		res.Status = false
+		res.Message = "Error generate token"
+		return
 	}
 
 	res.Status = true
-	res.Message = "Generate token success"
+	res.Message = "Token successfully generated"
 	res.Data = map[string]string{
 		"token": token,
 	}

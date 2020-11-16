@@ -71,7 +71,7 @@ func (q *usersRepository) fetch(ctx context.Context, query string, args ...inter
 	return result, nil
 }
 
-func (u *usersRepository) CheckLogin(ctx context.Context, dm *domain.Users) (res domain.Users, err error) {
+func (u *usersRepository) GetByUsername(ctx context.Context, dm *domain.Users) (res domain.Users, err error) {
 	query := `SELECT * FROM users WHERE username=?`
 	list, err := u.fetch(ctx, query, dm.Username)
 	if err != nil {
