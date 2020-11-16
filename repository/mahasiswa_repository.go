@@ -86,6 +86,10 @@ func (m *mahasiswaRepository) Fetch(ctx context.Context, cursor string, num int6
 		return nil, "", domain.ErrBadParamInput
 	}
 
+	fmt.Println("num:", num)
+	fmt.Println("cursor:", cursor)
+	fmt.Println("decodedCursor:", decodedCursor)
+
 	// Panggil fungsi fetch
 	res, err = m.fetch(ctx, query, decodedCursor, num)
 	if err != nil {
@@ -99,7 +103,8 @@ func (m *mahasiswaRepository) Fetch(ctx context.Context, cursor string, num int6
 		nextCursor = EncodeCursor(res[len(res)-1].CreatedAt)
 		// nextCursor = repository.EncodeCursor(res[len(res)-1].CreatedAt)
 	}
-	// fmt.Println(nextCursor)
+	fmt.Println("nextCursor:", nextCursor)
+	fmt.Println()
 
 	return
 }
