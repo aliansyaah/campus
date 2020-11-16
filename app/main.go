@@ -13,10 +13,10 @@ import (
 	"github.com/labstack/echo"
 	"github.com/spf13/viper"
 
-	mhsRepo "campus/repository"
-	mhsUsecase "campus/usecase"
-	mhsDeliv "campus/delivery"
-	mhsDelivMiddleware "campus/delivery/middleware"
+	repository "campus/repository"
+	usecase "campus/usecase"
+	delivery "campus/delivery"
+	deliveryMiddleware "campus/delivery/middleware"
 )
 
 // Init config with viper
@@ -75,7 +75,7 @@ func main() {
 	}()
 
 	e := echo.New()
-	middL := mhsDelivMiddleware.InitMiddleware()
+	middL := deliveryMiddleware.InitMiddleware()
 	e.Use(middL.CORS)
 
 	// Read context config from config.json
@@ -83,16 +83,16 @@ func main() {
 	// timeoutContext := time.Duration(30) * time.Second	// without viper
 
 	/* Layer Repository */
-	mr := mhsRepo.NewMahasiswaRepository(dbConn)
-	ur := mhsRepo.NewUsersRepository(dbConn)
+	mhsRepo := repository.NewMahasiswaRepository(dbConn)
+	usersRepo := repository.NewUsersRepository(dbConn)
 
 	/* Layer Usecase */
-	mu := mhsUsecase.NewMahasiswaUsecase(mr, timeoutContext)
-	uu := mhsUsecase.NewUsersUsecase(ur, timeoutContext)
+	mhsUc := usecase.NewMahasiswaUsecase(mhsRepo, timeoutContext)
+	usersUc := usecase.NewUsersUsecase(usersRepo, timeoutContext)
 
 	/* Layer Delivery */
-	mhsDeliv.NewMahasiswaHandler(e, mu)
-	mhsDeliv.NewUsersHandler(e, uu)
+	delivery.NewMahasiswaHandler(e, mhsUc)
+	delivery.NewUsersHandler(e, usersUc)
 
 	// Read server address config from config.json
 	log.Fatal(e.Start(viper.GetString("server.address")))	// with viper

@@ -34,13 +34,6 @@ func NewUsersHandler(e *echo.Echo, us domain.UsersUsecase) {
 
 	e.GET("/generate-hash/:password", GenerateHashPassword)	// http://localhost:9000/generate-hash/
 	e.POST("/login", handler.CheckLogin)
-
-	// e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
-	// // e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/
-	// e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
-	// e.POST("/", handler.Store)
-	// e.PUT("/", handler.Update)
-	// e.DELETE("/:id", handler.Delete)	// http://localhost:8080/8
 }
 
 func GenerateHashPassword(c echo.Context) error {

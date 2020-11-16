@@ -1,6 +1,7 @@
 package middleware
 
 import "github.com/labstack/echo"
+import "github.com/labstack/echo/middleware"
 
 // GoMiddleware represent the data-struct for middleware
 type GoMiddleware struct {
@@ -20,6 +21,6 @@ func InitMiddleware() *GoMiddleware {
 	return &GoMiddleware{}
 }
 
-// var IsAuthenticated = middleware.JWTWithConfig(middleware.JWTConfig{
-// 	SigningKey: []byte("secret"),
-// })
+var IsAuthenticated = middleware.JWTWithConfig(middleware.JWTConfig{
+	SigningKey: []byte("secret"),
+})

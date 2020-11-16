@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"database/sql"
 	// "os"
+	"campus/delivery/middleware"
 )
 
 // ResponseError represent the response error struct
@@ -33,12 +34,19 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 		MUsecase: us,
 	}
 
-	e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
-	// e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/
-	e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
-	e.POST("/", handler.Store)
-	e.PUT("/", handler.Update)
-	e.DELETE("/:id", handler.Delete)	// http://localhost:8080/8
+	// Not using auth
+	// e.GET("/", handler.FetchMahasiswa)	// http://localhost:8080/
+	// e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
+	// e.POST("/", handler.Store)
+	// e.PUT("/", handler.Update)
+	// e.DELETE("/:id", handler.Delete)	// http://localhost:8080/8
+
+	// Using auth
+	e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/
+	e.GET("/:id", handler.GetByID, middleware.IsAuthenticated)		// http://localhost:8080/2
+	e.POST("/", handler.Store, middleware.IsAuthenticated)
+	e.PUT("/", handler.Update, middleware.IsAuthenticated)
+	e.DELETE("/:id", handler.Delete, middleware.IsAuthenticated)	// http://localhost:8080/8
 }
 
 // FetchMahasiswa will fetch the mahasiswa based on given params
