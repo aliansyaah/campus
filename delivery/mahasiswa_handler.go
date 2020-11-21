@@ -39,14 +39,14 @@ func NewMahasiswaHandler(e *echo.Echo, us domain.MahasiswaUsecase) {
 	// e.GET("/:id", handler.GetByID)		// http://localhost:8080/2
 	// e.POST("/", handler.Store)
 	// e.PUT("/", handler.Update)
-	// e.DELETE("/:id", handler.Delete)	// http://localhost:8080/8
+	// e.DELETE("/:id", handler.Delete)		// http://localhost:8080/8
 
 	// Using auth
-	e.GET("/", handler.FetchMahasiswa, middleware.IsAuthenticated)	// http://localhost:8080/
-	e.GET("/:id", handler.GetByID, middleware.IsAuthenticated)		// http://localhost:8080/2
-	e.POST("/", handler.Store, middleware.IsAuthenticated)
-	e.PUT("/", handler.Update, middleware.IsAuthenticated)
-	e.DELETE("/:id", handler.Delete, middleware.IsAuthenticated)	// http://localhost:8080/8
+	e.GET("/mahasiswa", handler.FetchMahasiswa, middleware.IsAuthenticated)		// http://localhost:8080/mahasiswa
+	e.GET("/mahasiswa/:id", handler.GetByID, middleware.IsAuthenticated)		// http://localhost:8080/mahasiswa/2
+	e.POST("/mahasiswa", handler.Store, middleware.IsAuthenticated)
+	e.PUT("/mahasiswa", handler.Update, middleware.IsAuthenticated)
+	e.DELETE("/mahasiswa/:id", handler.Delete, middleware.IsAuthenticated)		// http://localhost:8080/mahasiswa/8
 }
 
 // FetchMahasiswa will fetch the mahasiswa based on given params
