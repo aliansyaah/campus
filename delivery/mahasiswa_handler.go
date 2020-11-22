@@ -142,7 +142,7 @@ func validateMahasiswa(c echo.Context, m domain.Mahasiswa) (domain.Mahasiswa, er
 func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	var mahasiswa domain.Mahasiswa
 
-	err = c.Bind(&mahasiswa)
+	err = c.Bind(&mahasiswa)	// pointer variable domain mahasiswa
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
@@ -171,7 +171,7 @@ func (m *MahasiswaHandler) Store(c echo.Context) (err error) {
 	// fmt.Println(mahasiswa)
 
 	ctx := c.Request().Context()
-	err = m.MUsecase.Store(ctx, &mahasiswa)
+	err = m.MUsecase.Store(ctx, &mahasiswa)		// pointer variable domain mahasiswa
 	// fmt.Println(&mahasiswa)
 
 	if err != nil {

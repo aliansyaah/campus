@@ -7,8 +7,8 @@ import "database/sql"
 
 type Mahasiswa struct {
 	ID int64 `json:"id"`
-	Nim int32
-	Name string
+	Nim int32 `json:"nim"`
+	Name string `json:"name"`
 	// Semester int32
 	Semester sql.NullInt32	`json:"semester"`		// sql.NullInt32 handle null possible values
 	CreatedAt time.Time `json:"created_at"`

@@ -64,6 +64,7 @@ func (m *mahasiswaUsecase) GetByNIM(c context.Context, nim int32) (res domain.Ma
 	return
 }
 
+// Parameter domain.Mahasiswa yg berupa variable pointer di-dereferencing (mengambil nilai asli variable pointer)
 func (m *mahasiswaUsecase) Store(c context.Context, dm *domain.Mahasiswa) (err error) {
 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
 	defer cancel()
