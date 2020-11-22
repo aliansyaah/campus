@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 	"time"
-	// "fmt"
+	"fmt"
 	"campus/domain"
 )
 
@@ -71,31 +71,62 @@ func (d *dosenUsecase) GetByID(c context.Context, id int64) (res domain.Response
 	return
 }
 
-// func (m *dosenUsecase) GetByNIM(c context.Context, nim int32) (res domain.Mahasiswa, err error) {
-// 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
-// 	defer cancel()
+// func (d *dosenUsecase) GetByNIP(c context.Context, nip int32) (res domain.Dosen, err error) {
+func (d *dosenUsecase) GetByNIP(c context.Context, nip int32) (res domain.Response, err error) {
+	ctx, cancel := context.WithTimeout(c, d.contextTimeout)
+	defer cancel()
 
-// 	res, err = m.mahasiswaRepo.GetByNIM(ctx, nim)
-// 	if err != nil {
-// 		return 
-// 	}
+	result, err := d.dosenRepo.GetByNIP(ctx, nip)
+	fmt.Println("Usecase GetByNIP result: ", result)
+	fmt.Println("Usecase GetByNIP err: ", err)
 
-// 	return
-// }
+	if err != nil {
+		res.Message = err.Error()
+		return 
+	}
 
-// func (m *dosenUsecase) Store(c context.Context, dm *domain.Mahasiswa) (err error) {
-// 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
-// 	defer cancel()
+	res.Status = true
+	res.Message = "Data found"
+	res.Data = map[string]interface{}{
+		"data": result,
+	}
+
+	return
+}
+
+func (d *dosenUsecase) Store(c context.Context, dd *domain.Dosen) (res domain.Response, err error) {
+	ctx, cancel := context.WithTimeout(c, d.contextTimeout)
+	defer cancel()
 	
-// 	// Cek jika ada NIM yg sama
-// 	existedMahasiswa, _ := m.GetByNIM(ctx, dm.Nim)
-// 	if existedMahasiswa != (domain.Mahasiswa{}) {
-// 		return domain.ErrConflict
-// 	}
+	// Cek jika ada NIP yg sama
+	existedDosen, _ := d.GetByNIP(ctx, dd.Nip)
+	fmt.Println("Usecase existedDosen result: ", existedDosen)
 
-// 	err = m.mahasiswaRepo.Store(ctx, dm)
-// 	return
-// }
+	if existedDosen.Status == true {
+		err = domain.ErrConflict
+		res.Message = "NIP sudah terpakai"
+		return 
+	}
+
+	err = d.dosenRepo.Store(ctx, dd)
+	if err != nil {
+		res.Message = err.Error()
+		return 
+	}
+
+	// fmt.Println(dd)
+	// fmt.Println(&dd)
+	// fmt.Println(*dd)
+
+	res.Status = true
+	res.Message = "Data successfully created"
+	res.Data = dd
+	// res.Data = map[string]interface{}{
+	// 	"data": dd,
+	// }
+
+	return
+}
 
 // func (m *dosenUsecase) Update(c context.Context, dm *domain.Mahasiswa) (err error) {
 // 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)

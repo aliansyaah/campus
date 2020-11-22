@@ -11,7 +11,7 @@ import (
 
 	"github.com/labstack/echo"
 	// "github.com/sirupsen/logrus"
-	// validator "gopkg.in/go-playground/validator.v9"
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 // DosenHandler represent the httphandler for dosen
@@ -27,7 +27,7 @@ func NewDosenHandler(e *echo.Echo, du domain.DosenUsecase) {
 	// Using auth
 	e.GET("/dosen", handler.FetchDosen, middleware.IsAuthenticated)		// http://localhost:8080/dosen
 	e.GET("/dosen/:id", handler.GetByID, middleware.IsAuthenticated)	// http://localhost:8080/dosen/2
-	// e.POST("/", handler.Store, middleware.IsAuthenticated)
+	e.POST("/dosen", handler.Store, middleware.IsAuthenticated)
 	// e.PUT("/", handler.Update, middleware.IsAuthenticated)
 	// e.DELETE("/:id", handler.Delete, middleware.IsAuthenticated)	// http://localhost:8080/8
 }
@@ -88,106 +88,44 @@ func (d *DosenHandler) GetByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// func isRequestMahasiswaValid(m *domain.Mahasiswa) (bool, error) {
-// 	validate := validator.New()
-// 	err := validate.Struct(m)
-// 	if err != nil {
-// 		return false, err
-// 	}
-// 	return true, nil
-// }
+func isDosenRequestValid(m *domain.Dosen) (bool, error) {
+	validate := validator.New()
+	err := validate.Struct(m)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
-// func validateSemester(c echo.Context) (sql.NullInt32, error) {
-// 	var mahasiswa domain.Mahasiswa
-// 	var sem sql.NullInt32
+func (m *DosenHandler) Store(c echo.Context) (err error) {
+	var dosen domain.Dosen
 
-// 	reqSem := c.FormValue("semester")
-// 	// fmt.Println(reqSem)
-// 	if reqSem != "" {
-// 		fmt.Println("semester not empty")
-// 		if err := sem.Scan(reqSem); err != nil {
-// 			// panic(err)
-// 			// return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
-// 			return sem, err
-// 		}
-// 	}
-// 	mahasiswa.Semester = sem
+	err = c.Bind(&dosen)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+	fmt.Println(&dosen)
 
-// 	// fmt.Println(&mahasiswa)
-// 	// fmt.Println(mahasiswa.Semester)
-// 	// fmt.Printf("var semester = %T\n", semester)
-// 	// fmt.Printf("var mahasiswa.Semester = %T\n", mahasiswa.Semester)
+	var ok bool
+	if ok, err = isDosenRequestValid(&dosen); !ok {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 
-// 	// return true, nil
-// 	return mahasiswa.Semester, nil
-// }
+	ctx := c.Request().Context()
+	res, err := m.DosenUc.Store(ctx, &dosen)
+	fmt.Println("Handler res: ", res)
+	fmt.Println("Handler err: ", err)
 
-// func validateMahasiswa(c echo.Context, m domain.Mahasiswa) (domain.Mahasiswa, error) {
-// 	// var mahasiswa domain.Mahasiswa
-// 	var sem sql.NullInt32						// deklarasi var sem dgn tipe data NullInt32
+	if err != nil {
+		// return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return c.JSON(getStatusCode(err), res)
+	}
 
-// 	reqSem := c.FormValue("semester")			// ambil request dgn nama "semester"
-	
-// 	if reqSem != "" {							// jika request "semester" tidak kosong
-// 		// fmt.Println("semester not empty")
-// 		if err := sem.Scan(reqSem); err != nil {
-// 			// panic(err)
-// 			return m, err
-// 		}
-// 	}
-// 	// mahasiswa.Semester = sem
-// 	m.Semester = sem 	// variabel "sem" dimasukkan ke property "Semester" pada struct "mahasiswa"
-
-// 	// fmt.Printf("var semester = %T\n", semester)
-// 	// fmt.Printf("var mahasiswa.Semester = %T\n", mahasiswa.Semester)
-
-// 	return m, nil
-// }
-
-// func (m *DosenHandler) Store(c echo.Context) (err error) {
-// 	var mahasiswa domain.Mahasiswa
-
-// 	err = c.Bind(&mahasiswa)
-// 	if err != nil {
-// 		return c.JSON(http.StatusUnprocessableEntity, err.Error())
-// 	}
-// 	// fmt.Println(&mahasiswa)
-// 	// fmt.Println(mahasiswa.Semester)
-
-// 	var ok bool
-// 	if ok, err = isRequestMahasiswaValid(&mahasiswa); !ok {
-// 		return c.JSON(http.StatusBadRequest, err.Error())
-// 	}
-
-// 	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
-// 	// var sem sql.NullInt32
-// 	// if sem, err = validateSemester(c); err != nil {
-// 	// 	return c.JSON(http.StatusBadRequest, err.Error())
-// 	// }
-// 	// mahasiswa.Semester = sem
-// 	// fmt.Println(&mahasiswa)
-// 	// fmt.Println(mahasiswa.Semester)
-
-// 	/* Handle request tipe data DB sql.NullInt32 agar tidak null ketika insert */
-// 	if mahasiswa, err = validateMahasiswa(c, mahasiswa); err != nil {
-// 		return c.JSON(http.StatusBadRequest, err.Error())
-// 	}
-// 	// fmt.Println(&mahasiswa)
-// 	// fmt.Println(mahasiswa)
-
-// 	ctx := c.Request().Context()
-// 	err = m.DUsecase.Store(ctx, &mahasiswa)
-// 	// fmt.Println(&mahasiswa)
-
-// 	if err != nil {
-// 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
-// 	}
-
-// 	return c.JSON(http.StatusCreated, mahasiswa)
-// }
+	return c.JSON(http.StatusCreated, res)
+}
 
 // func (m *DosenHandler) Update(c echo.Context) (err error) {
-// 	var mahasiswa domain.Mahasiswa
+// 	var mahasiswa domain.Dosen
 
 // 	err = c.Bind(&mahasiswa)
 // 	if err != nil {

@@ -125,47 +125,48 @@ func (d *dosenRepository) GetByID(ctx context.Context, id int64) (res domain.Dos
 	return
 }
 
-// func (m *mahasiswaRepository) GetByNIM(ctx context.Context, nim int32) (res domain.Mahasiswa, err error) {
-// 	query := `SELECT id, nim, name, semester, created_at, updated_at
-// 				FROM mahasiswa 
-// 				WHERE nim = ?`
+func (d *dosenRepository) GetByNIP(ctx context.Context, nip int32) (res domain.Dosen, err error) {
+	query := `SELECT id_dosen, nip, name, created_at, updated_at
+				FROM dosen 
+				WHERE nip = ?`
 
-// 	list, err := m.fetch(ctx, query, nim)
-// 	if err != nil {
-// 		return 
-// 	}
+	list, err := d.fetch(ctx, query, nip)
+	if err != nil {
+		return 
+	}
 
-// 	if len(list) > 0 {
-// 		res = list[0]
-// 	} else {
-// 		return res, domain.ErrNotFound
-// 	}
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
 
-// 	return
-// }
+	return
+}
 
-// func (m *mahasiswaRepository) Store(ctx context.Context, dm *domain.Mahasiswa) (err error) {
-// 	// Insert datetime bisa pakai "time.Now()" atau langsung di query pakai "now()"
-// 	// query := `INSERT mahasiswa SET nim=?, name=?, semester=?, created_at=?, updated_at=now()`
-// 	query := `INSERT mahasiswa SET nim=?, name=?, semester=?, created_at=?`
-// 	stmt, err := m.Conn.PrepareContext(ctx, query)
-// 	if err != nil {
-// 		return 
-// 	}
+func (d *dosenRepository) Store(ctx context.Context, dd *domain.Dosen) (err error) {
+	// Insert datetime bisa pakai "time.Now()" atau langsung di query pakai "now()"
+	// query := `INSERT dosen SET nip=?, name=?, created_at=?`
+	query := `INSERT dosen SET nip=?, name=?, created_at=now()`
+	stmt, err := d.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 
+	}
 
-// 	res, err := stmt.ExecContext(ctx, dm.Nim, dm.Name, dm.Semester, time.Now())
-// 	if err != nil {
-// 		return 
-// 	}
+	// res, err := stmt.ExecContext(ctx, dd.Nip, dd.Name, time.Now())
+	res, err := stmt.ExecContext(ctx, dd.Nip, dd.Name)
+	if err != nil {
+		return 
+	}
 
-// 	lastID, err := res.LastInsertId()	// ambil id terakhir
-// 	if err != nil {
-// 		return 
-// 	}
+	lastID, err := res.LastInsertId()	// ambil id terakhir
+	if err != nil {
+		return 
+	}
 
-// 	dm.ID = lastID 		// property "ID" pada struct "mahasiswa" akan berisi ID terakhir
-// 	return
-// }
+	dd.ID = lastID 		// property "ID" pada struct "dosen" akan berisi ID terakhir
+	return
+}
 
 // func (m *mahasiswaRepository) Update(ctx context.Context, dm *domain.Mahasiswa) (err error) {
 // 	query := `UPDATE mahasiswa SET nim=?, name=?, semester=?, updated_at=now() WHERE ID = ?`
