@@ -16,16 +16,12 @@ type Dosen struct {
 
 // DosenUsecase
 type DosenUsecase interface {
-	// Fetch(ctx context.Context, cursor string, num int64) ([]Dosen, string, error)
 	Fetch(ctx context.Context, cursor string, num int64) (Response, error)
-	// GetByID(ctx context.Context, id int64) (Dosen, error)
 	GetByID(ctx context.Context, id int64) (Response, error)
-	// GetByNIM(ctx context.Context, nim int32) (Mahasiswa, error)
 	GetByNIP(ctx context.Context, nim int32) (Response, error)
-	// Store(ctx context.Context, d *Dosen) error
 	Store(ctx context.Context, d *Dosen) (Response, error)
-	// Update(ctx context.Context, m *Mahasiswa) error
-	// Delete(ctx context.Context, id int64) error
+	Update(ctx context.Context, d *Dosen) (Response, error)
+	Delete(ctx context.Context, id int64) (Response, error)
 }
 
 // DosenRepository
@@ -34,6 +30,6 @@ type DosenRepository interface {
 	GetByID(ctx context.Context, id int64) (Dosen, error)
 	GetByNIP(ctx context.Context, nim int32) (Dosen, error)
 	Store(ctx context.Context, d *Dosen) error
-	// Update(ctx context.Context, m *Mahasiswa) error
-	// Delete(ctx context.Context, id int64) error
+	Update(ctx context.Context, d *Dosen) error
+	Delete(ctx context.Context, id int64) error
 }

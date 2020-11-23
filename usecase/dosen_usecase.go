@@ -104,7 +104,7 @@ func (d *dosenUsecase) Store(c context.Context, dd *domain.Dosen) (res domain.Re
 
 	if existedDosen.Status == true {
 		err = domain.ErrConflict
-		res.Message = "NIP sudah terpakai"
+		res.Message = "NIP already in use"
 		return 
 	}
 
@@ -128,34 +128,50 @@ func (d *dosenUsecase) Store(c context.Context, dd *domain.Dosen) (res domain.Re
 	return
 }
 
-// func (m *dosenUsecase) Update(c context.Context, dm *domain.Mahasiswa) (err error) {
-// 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
-// 	defer cancel()
+func (d *dosenUsecase) Update(c context.Context, dd *domain.Dosen) (res domain.Response, err error) {
+	ctx, cancel := context.WithTimeout(c, d.contextTimeout)
+	defer cancel()
 
-// 	// Cek jika ada NIM yg sama
-// 	// existedMahasiswa, _ := m.GetByNIM(ctx, dm.Nim)
-// 	// if existedMahasiswa != (domain.Mahasiswa{}) {
-// 	// 	return domain.ErrConflict
-// 	// }
+	err = d.dosenRepo.Update(ctx, dd)
+	if err != nil {
+		res.Message = err.Error()
+		return 
+	}
 
-// 	// dm.UpdatedAt = time.Now()
-// 	return m.mahasiswaRepo.Update(ctx, dm)
-// }
+	res.Status = true
+	res.Message = "Data successfully updated"
+	res.Data = dd
 
-// func (m *dosenUsecase) Delete(c context.Context, id int64) (err error) {
-// 	ctx, cancel := context.WithTimeout(c, m.contextTimeout)
-// 	defer cancel()
+	return 
+}
 
-// 	existedMahasiswa, err := m.mahasiswaRepo.GetByID(ctx, id)
-// 	if err != nil {
-// 		return 
-// 	}
-// 	// fmt.Println(existedMahasiswa)
-// 	// fmt.Println(domain.Mahasiswa{})
+func (d *dosenUsecase) Delete(c context.Context, id int64) (res domain.Response, err error) {
+	ctx, cancel := context.WithTimeout(c, d.contextTimeout)
+	defer cancel()
 
-// 	if existedMahasiswa == (domain.Mahasiswa{}) {
-// 		return domain.ErrNotFound
-// 	}
+	existedDosen, err := d.dosenRepo.GetByID(ctx, id)
+	if err != nil {
+		res.Message = "No data can be deleted"
+		return 
+	}
+	fmt.Println(existedDosen)
+	// fmt.Println(domain.Dosen{})
 
-// 	return m.mahasiswaRepo.Delete(ctx, id)
-// }
+	// if existedDosen == (domain.Dosen{}) {
+	// 	err = domain.ErrNotFound
+	// 	res.Message = "Entity tidak sama"
+	// 	return
+	// }
+
+	err = d.dosenRepo.Delete(ctx, id)
+	if err != nil {
+		res.Message = err.Error()
+		return 
+	}
+
+	res.Status = true
+	res.Message = "Data successfully deleted"
+	res.Data = existedDosen
+
+	return 
+}

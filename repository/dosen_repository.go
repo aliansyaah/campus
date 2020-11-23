@@ -168,55 +168,54 @@ func (d *dosenRepository) Store(ctx context.Context, dd *domain.Dosen) (err erro
 	return
 }
 
-// func (m *mahasiswaRepository) Update(ctx context.Context, dm *domain.Mahasiswa) (err error) {
-// 	query := `UPDATE mahasiswa SET nim=?, name=?, semester=?, updated_at=now() WHERE ID = ?`
-// 	stmt, err := m.Conn.PrepareContext(ctx, query)
-// 	if err != nil {
-// 		return 
-// 	}
+func (d *dosenRepository) Update(ctx context.Context, dd *domain.Dosen) (err error) {
+	query := `UPDATE dosen SET nip=?, name=?, updated_at=now() WHERE id_dosen = ?`
+	stmt, err := d.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 
+	}
 
-// 	// res, err := stmt.ExecContext(ctx, dm.Nim, dm.Name, dm.Semester, dm.UpdatedAt, dm.ID)
-// 	res, err := stmt.ExecContext(ctx, dm.Nim, dm.Name, dm.Semester, dm.ID)
-// 	if err != nil {
-// 		return 
-// 	}
+	res, err := stmt.ExecContext(ctx, dd.Nip, dd.Name, dd.ID)
+	if err != nil {
+		return 
+	}
 
-// 	affect, err := res.RowsAffected()
-// 	if err != nil {
-// 		return 
-// 	}
-// 	fmt.Println("Row affected: ", affect)
+	affect, err := res.RowsAffected()
+	if err != nil {
+		return 
+	}
+	fmt.Println("Row affected: ", affect)
 
-// 	if affect != 1 {
-// 		err = fmt.Errorf("Weird behavior. Total affected: %d", affect)
-// 		return
-// 	}
+	if affect != 1 {
+		err = fmt.Errorf("Weird behavior. Total affected: %d", affect)
+		return
+	}
 
-// 	return
-// }
+	return
+}
 
-// func (m *mahasiswaRepository) Delete(ctx context.Context, id int64) (err error) {
-// 	query := `DELETE FROM mahasiswa WHERE id = ?`
-// 	stmt, err := m.Conn.PrepareContext(ctx, query)
-// 	if err != nil {
-// 		return 
-// 	}
+func (d *dosenRepository) Delete(ctx context.Context, id int64) (err error) {
+	query := `DELETE FROM dosen WHERE id_dosen = ?`
+	stmt, err := d.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 
+	}
 
-// 	res, err := stmt.ExecContext(ctx, id)
-// 	if err != nil {
-// 		return 
-// 	}
+	res, err := stmt.ExecContext(ctx, id)
+	if err != nil {
+		return 
+	}
 
-// 	affect, err := res.RowsAffected()
-// 	if err != nil {
-// 		return 
-// 	}
-// 	fmt.Println("Row affected: ", affect)
+	affect, err := res.RowsAffected()
+	if err != nil {
+		return 
+	}
+	fmt.Println("Row affected: ", affect)
 
-// 	if affect != 1 {
-// 		err = fmt.Errorf("Weird behavior. Total affected: %d", affect)
-// 		return
-// 	}
+	if affect != 1 {
+		err = fmt.Errorf("Weird behavior. Total affected: %d", affect)
+		return
+	}
 
-// 	return
-// }
+	return
+}
