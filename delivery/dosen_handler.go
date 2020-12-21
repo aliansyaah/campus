@@ -90,7 +90,7 @@ func (d *DosenHandler) GetByID(c echo.Context) error {
 
 func isRequestDosenValid(d *domain.Dosen) (bool, error) {
 	validate := validator.New()
-	err := validate.Struct(d)
+	err := validate.Struct(d)	// validasi struct
 	if err != nil {
 		return false, err
 	}
@@ -100,6 +100,7 @@ func isRequestDosenValid(d *domain.Dosen) (bool, error) {
 func (d *DosenHandler) Store(c echo.Context) (err error) {
 	var dosen domain.Dosen
 
+	// Method .Bind() milik echo.Context digunakan dgn disisipi param pointer object hasil cetakan struct Dosen
 	err = c.Bind(&dosen)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, err.Error())

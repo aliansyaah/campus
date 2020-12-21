@@ -7,7 +7,7 @@ import "github.com/go-sql-driver/mysql"
 
 type Dosen struct {
 	ID int64 `json:"id_dosen"`
-	Nip int32 `json:"nip" validate:"required"`
+	Nip int32 `json:"nip" validate:"required"`		// tag validate utk payload validation
 	Name string `json:"name" validate:"required"`
 	CreatedAt time.Time `json:"created_at"`
 	// UpdatedAt time.Time `json:"updated_at"`
