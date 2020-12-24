@@ -86,16 +86,19 @@ func main() {
 	mhsRepo := repository.NewMahasiswaRepository(dbConn)
 	usersRepo := repository.NewUsersRepository(dbConn)
 	dosenRepo := repository.NewDosenRepository(dbConn)
+	kelasRepo := repository.NewKelasRepository(dbConn)
 
 	/* Layer Usecase */
 	mhsUc := usecase.NewMahasiswaUsecase(mhsRepo, timeoutContext)
 	usersUc := usecase.NewUsersUsecase(usersRepo, timeoutContext)
 	dosenUc := usecase.NewDosenUsecase(dosenRepo, timeoutContext)
+	kelasUc := usecase.NewKelasUsecase(kelasRepo, timeoutContext)
 
 	/* Layer Delivery */
 	delivery.NewMahasiswaHandler(e, mhsUc)
 	delivery.NewUsersHandler(e, usersUc)
 	delivery.NewDosenHandler(e, dosenUc)
+	delivery.NewKelasHandler(e, kelasUc)
 
 	// Read server address config from config.json
 	log.Fatal(e.Start(viper.GetString("server.address")))	// with viper
