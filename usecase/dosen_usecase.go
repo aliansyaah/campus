@@ -39,7 +39,8 @@ func (d *dosenUsecase) Fetch(c context.Context, cursor string, num int64) (res d
 	}
 
 	res.Status = true
-	res.Message = "Data was successfully obtained"
+	// res.Message = "Data was successfully obtained"
+	res.Message = domain.SuccDataFound
 	res.Data = map[string]interface{}{
 		"data": result,
 		"nextCursor": nextCursor,
@@ -63,7 +64,8 @@ func (d *dosenUsecase) GetByID(c context.Context, id int64) (res domain.Response
 	}
 
 	res.Status = true
-	res.Message = "Data found"
+	// res.Message = "Data found"
+	res.Message = domain.SuccDataFound
 	res.Data = map[string]interface{}{
 		"data": result,
 	}
@@ -86,7 +88,8 @@ func (d *dosenUsecase) GetByNIP(c context.Context, nip int32) (res domain.Respon
 	}
 
 	res.Status = true
-	res.Message = "Data found"
+	// res.Message = "Data found"
+	res.Message = domain.SuccDataFound
 	res.Data = map[string]interface{}{
 		"data": result,
 	}
@@ -119,7 +122,8 @@ func (d *dosenUsecase) Store(c context.Context, dd *domain.Dosen) (res domain.Re
 	// fmt.Println(*dd)
 
 	res.Status = true
-	res.Message = "Data successfully created"
+	// res.Message = "Data successfully created"
+	res.Message = domain.SuccCreateData
 	res.Data = dd
 	// res.Data = map[string]interface{}{
 	// 	"data": dd,
@@ -139,7 +143,7 @@ func (d *dosenUsecase) Update(c context.Context, dd *domain.Dosen) (res domain.R
 	}
 
 	res.Status = true
-	res.Message = "Data successfully updated"
+	res.Message = domain.SuccUpdateData
 	res.Data = dd
 
 	return 
@@ -170,7 +174,8 @@ func (d *dosenUsecase) Delete(c context.Context, id int64) (res domain.Response,
 	}
 
 	res.Status = true
-	res.Message = "Data successfully deleted"
+	// res.Message = "Data successfully deleted"
+	res.Message = domain.SuccDeleteData
 	res.Data = existedDosen
 
 	return 
