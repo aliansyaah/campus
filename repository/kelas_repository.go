@@ -17,8 +17,8 @@ func NewKelasRepository(Conn *sql.DB) domain.KelasRepository {
 	return &kelasRepository{Conn}
 }
 
-func (q *kelasRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Kelas, err error) {
-	rows, err := q.Conn.QueryContext(ctx, query, args...)
+func (k *kelasRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Kelas, err error) {
+	rows, err := k.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
@@ -78,20 +78,20 @@ func (q *kelasRepository) fetch(ctx context.Context, query string, args ...inter
 			logrus.Error(err)
 			return nil, err
 		}
-		toBeAdded.RuangID = domain.Ruang{
+		toBeAdded.Ruang = domain.Ruang{
 			ID: ruangID,
 			Name: ruangName,
 		}
-		toBeAdded.MataKuliahID = domain.MataKuliah{
+		toBeAdded.MataKuliah = domain.MataKuliah{
 			ID: mataKuliahID,
 			Name: matakuliahName,
 		}
-		toBeAdded.DosenID = domain.Dosen{
+		toBeAdded.Dosen = domain.Dosen{
 			ID: dosenID,
 			Nip: dosenNip,
 			Name: dosenName,
 		}
-		toBeAdded.MahasiswaID = domain.Mahasiswa{
+		toBeAdded.Mahasiswa = domain.Mahasiswa{
 			ID: mahasiswaID,
 			Nim: mahasiswaNim,
 			Name: mahasiswaName,
@@ -108,7 +108,7 @@ func (q *kelasRepository) fetch(ctx context.Context, query string, args ...inter
 	return result, nil
 }
 
-func (m *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Kelas, nextCursor string, err error) {
+func (k *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Kelas, nextCursor string, err error) {
 	// Query fetch Kelas
 
 	// query := `SELECT id_kelas, name, ruang_id, mata_kuliah_id, dosen_id, mahasiswa_id, 
@@ -143,7 +143,7 @@ func (m *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (
 	fmt.Println("decodedCursor:", decodedCursor)
 
 	// Panggil fungsi fetch
-	res, err = m.fetch(ctx, query, decodedCursor, num)
+	res, err = k.fetch(ctx, query, decodedCursor, num)
 	if err != nil {
 		return nil, "", err
 	}
@@ -158,5 +158,49 @@ func (m *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (
 	fmt.Println("nextCursor:", nextCursor)
 	fmt.Println()
 
+	return
+}
+
+func (k *kelasRepository) CheckIfExists(ctx context.Context, dk *domain.Kelas) (res domain.Kelas, err error) {
+	query := `SELECT id_kelas, name, ruang_id, mata_kuliah_id, dosen_id, mahasiswa_id
+				FROM kelas 
+				WHERE ruang_id = ?
+				AND mata_kuliah_id = ?
+				AND dosen_id = ?
+				AND mahasiswa_id = ?`
+
+	list, err := k.fetch(ctx, query, dk.Ruang.ID, dk.MataKuliah.ID, dk.Dosen.ID, dk.Mahasiswa.ID)
+	if err != nil {
+		return 
+	}
+
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
+
+	return
+}
+
+func (k *kelasRepository) Store(ctx context.Context, dk *domain.Kelas) (err error) {
+	query := `INSERT kelas SET name=?, ruang_id=?, mata_kuliah_id=?, dosen_id=?, mahasiswa_id=?, 
+		created_by=?, created_at=now()`
+	stmt, err := k.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return 
+	}
+
+	res, err := stmt.ExecContext(ctx, dk.Name, dk.Ruang.ID, dk.MataKuliah.ID, dk.Dosen.ID, dk.Mahasiswa.ID, dk.CreatedBy)
+	if err != nil {
+		return 
+	}
+
+	lastID, err := res.LastInsertId()	// ambil id terakhir
+	if err != nil {
+		return 
+	}
+
+	dk.ID = lastID 		// property "ID" pada struct "kelas" akan berisi ID terakhir
 	return
 }
