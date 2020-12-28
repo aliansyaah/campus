@@ -46,9 +46,12 @@ func (q *kelasRepository) fetch(ctx context.Context, query string, args ...inter
 		mataKuliahID := int64(0)
 		matakuliahName := string(0)
 		dosenID := int64(0)
+		dosenNip := int32(0)
 		dosenName := string(0)
 		mahasiswaID := int64(0)
+		mahasiswaNim := int32(0)
 		mahasiswaName := string(0)
+		var mahasiswaSemester sql.NullInt32
 
 		err = rows.Scan(
 			&toBeAdded.ID,
@@ -63,8 +66,11 @@ func (q *kelasRepository) fetch(ctx context.Context, query string, args ...inter
 			&toBeAdded.UpdatedAt,
 			&ruangName,
 			&matakuliahName,
+			&dosenNip,
 			&dosenName,
+			&mahasiswaNim,
 			&mahasiswaName,
+			&mahasiswaSemester,
 		)
 		// fmt.Println("err: ", err)
 
@@ -82,11 +88,14 @@ func (q *kelasRepository) fetch(ctx context.Context, query string, args ...inter
 		}
 		toBeAdded.DosenID = domain.Dosen{
 			ID: dosenID,
+			Nip: dosenNip,
 			Name: dosenName,
 		}
 		toBeAdded.MahasiswaID = domain.Mahasiswa{
 			ID: mahasiswaID,
+			Nim: mahasiswaNim,
 			Name: mahasiswaName,
+			Semester: mahasiswaSemester,
 		}
 		// fmt.Println("toBeAdded 2: ", toBeAdded)
 		
@@ -111,7 +120,9 @@ func (m *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (
 	query := `SELECT id_kelas, kelas.name, ruang_id, mata_kuliah_id, dosen_id, mahasiswa_id, 
 				created_by, kelas.created_at, updated_by, kelas.updated_at,
 				ruang.name AS ruang_name, mata_kuliah.name AS mata_kuliah_name,
-				dosen.name AS dosen_name, mahasiswa.name AS mahasiswa_name
+				dosen.nip AS dosen_nip, dosen.name AS dosen_name, 
+				mahasiswa.nim AS mahasiswa_nim, mahasiswa.name AS mahasiswa_name, 
+				mahasiswa.semester AS mahasiswa_semester
 				FROM kelas
 				LEFT JOIN ruang ON ruang.id_ruang = kelas.ruang_id
 				LEFT JOIN mata_kuliah ON mata_kuliah.id_mata_kuliah = kelas.mata_kuliah_id
