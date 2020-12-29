@@ -109,8 +109,6 @@ func (k *kelasRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (k *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (res []domain.Kelas, nextCursor string, err error) {
-	// Query fetch Kelas
-
 	// query := `SELECT id_kelas, name, ruang_id, mata_kuliah_id, dosen_id, mahasiswa_id, 
 	// 			created_by, created_at, updated_by, updated_at
 	// 			FROM kelas
@@ -123,13 +121,13 @@ func (k *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (
 				dosen.nip AS dosen_nip, dosen.name AS dosen_name, 
 				mahasiswa.nim AS mahasiswa_nim, mahasiswa.name AS mahasiswa_name, 
 				mahasiswa.semester AS mahasiswa_semester
-				FROM kelas
-				LEFT JOIN ruang ON ruang.id_ruang = kelas.ruang_id
-				LEFT JOIN mata_kuliah ON mata_kuliah.id_mata_kuliah = kelas.mata_kuliah_id
-				LEFT JOIN dosen ON dosen.id_dosen = kelas.dosen_id
-				LEFT JOIN mahasiswa ON mahasiswa.id = kelas.mahasiswa_id
-				WHERE kelas.created_at > ?
-				ORDER BY kelas.created_at LIMIT ?`
+			FROM kelas
+			LEFT JOIN ruang ON ruang.id_ruang = kelas.ruang_id
+			LEFT JOIN mata_kuliah ON mata_kuliah.id_mata_kuliah = kelas.mata_kuliah_id
+			LEFT JOIN dosen ON dosen.id_dosen = kelas.dosen_id
+			LEFT JOIN mahasiswa ON mahasiswa.id = kelas.mahasiswa_id
+			WHERE kelas.created_at > ?
+			ORDER BY kelas.created_at LIMIT ?`
 
 	// Decoding cursor
 	decodedCursor, err := DecodeCursor(cursor)
@@ -161,15 +159,74 @@ func (k *kelasRepository) Fetch(ctx context.Context, cursor string, num int64) (
 	return
 }
 
+func (k *kelasRepository) fetchByUniqID(ctx context.Context, query string, args ...interface{}) (result []domain.Kelas, err error) {
+	rows, err := k.Conn.QueryContext(ctx, query, args...)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	defer func() {
+		errRow := rows.Close()
+		if errRow != nil {
+			logrus.Error(err)
+		}
+	}()
+
+	// Membuat slice baru dari awal
+	// make(type slice, panjang, kapasitas)
+	result = make([]domain.Kelas, 0)	// tipe = slice domain.Kelas
+
+	// Looping rows hasil query
+	for rows.Next() {
+		toBeAdded := domain.Kelas{}		// struct kelas pada layer domain/model
+		ruangID := int64(0)
+		mataKuliahID := int64(0)
+		dosenID := int64(0)
+		mahasiswaID := int64(0)
+
+		err = rows.Scan(
+			&toBeAdded.ID,
+			&toBeAdded.Name,
+			&ruangID,
+			&mataKuliahID,
+			&dosenID,
+			&mahasiswaID,
+		)
+
+		if err != nil {
+			logrus.Error(err)
+			return nil, err
+		}
+		toBeAdded.Ruang = domain.Ruang{
+			ID: ruangID,
+		}
+		toBeAdded.MataKuliah = domain.MataKuliah{
+			ID: mataKuliahID,
+		}
+		toBeAdded.Dosen = domain.Dosen{
+			ID: dosenID,
+		}
+		toBeAdded.Mahasiswa = domain.Mahasiswa{
+			ID: mahasiswaID,
+		}
+		
+		// Jika tdk error, masukkan hasil ke slice result
+		result = append(result, toBeAdded)
+	}
+
+	return result, nil
+}
+
 func (k *kelasRepository) CheckIfExists(ctx context.Context, dk *domain.Kelas) (res domain.Kelas, err error) {
 	query := `SELECT id_kelas, name, ruang_id, mata_kuliah_id, dosen_id, mahasiswa_id
-				FROM kelas 
-				WHERE ruang_id = ?
-				AND mata_kuliah_id = ?
-				AND dosen_id = ?
-				AND mahasiswa_id = ?`
+			FROM kelas 
+			WHERE ruang_id = ?
+			AND mata_kuliah_id = ?
+			AND dosen_id = ?
+			AND mahasiswa_id = ?`
 
-	list, err := k.fetch(ctx, query, dk.Ruang.ID, dk.MataKuliah.ID, dk.Dosen.ID, dk.Mahasiswa.ID)
+	list, err := k.fetchByUniqID(ctx, query, dk.Ruang.ID, dk.MataKuliah.ID, dk.Dosen.ID, dk.Mahasiswa.ID)
 	if err != nil {
 		return 
 	}
@@ -177,7 +234,8 @@ func (k *kelasRepository) CheckIfExists(ctx context.Context, dk *domain.Kelas) (
 	if len(list) > 0 {
 		res = list[0]
 	} else {
-		return res, domain.ErrNotFound
+		// return res, domain.ErrNotFound
+		return res, nil
 	}
 
 	return

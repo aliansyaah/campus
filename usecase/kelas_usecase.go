@@ -12,9 +12,9 @@ type kelasUsecase struct {
 	contextTimeout time.Duration
 }
 
-func NewKelasUsecase(d domain.KelasRepository, timeout time.Duration) domain.KelasUsecase {
+func NewKelasUsecase(k domain.KelasRepository, timeout time.Duration) domain.KelasUsecase {
 	return &kelasUsecase{
-		kelasRepo: d,
+		kelasRepo: k,
 		contextTimeout: timeout,
 	}
 }
@@ -55,6 +55,7 @@ func (k *kelasUsecase) CheckIfExists(c context.Context, dk *domain.Kelas) (res d
 
 	result, err := k.kelasRepo.CheckIfExists(ctx, dk)
 	fmt.Println("Usecase CheckIfExists result: ", result)
+	// fmt.Println("Usecase CheckIfExists domain.Kelas: ", domain.Kelas{})
 	fmt.Println("Usecase CheckIfExists err: ", err)
 
 	if err != nil {
@@ -62,9 +63,15 @@ func (k *kelasUsecase) CheckIfExists(c context.Context, dk *domain.Kelas) (res d
 		return 
 	}
 
+	// result harus sama dgn domain.Kelas (result kosong & domain.Kelas juga kosong)
+	if result != (domain.Kelas{}) {
+		res.Message = "This kelas data already exists"
+		return
+	}
+
+	// Return result
 	res.Status = true
-	// res.Message = "Data found"
-	res.Message = domain.SuccDataFound
+	res.Message = "Your item is not exists"
 	res.Data = map[string]interface{}{
 		"data": result,
 	}
@@ -77,32 +84,31 @@ func (k *kelasUsecase) Store(c context.Context, dk *domain.Kelas) (res domain.Re
 	defer cancel()
 	
 	// Cek jika ada data yg sama
-	existedKelas, _ := k.CheckIfExists(ctx, dk)
+	existedKelas, err := k.CheckIfExists(ctx, dk)
 	fmt.Println("Usecase existedKelas result: ", existedKelas)
 
-	if existedKelas.Status == true {
-		err = domain.ErrConflict
-		res.Message = "This kelas data already exists"
+	if err != nil {
+		res.Message = err.Error()
 		return 
 	}
 
+	if existedKelas.Status == false {
+		err = domain.ErrConflict
+		res.Message = existedKelas.Message
+		return 
+	}
+
+	// Insert data
 	err = k.kelasRepo.Store(ctx, dk)
 	if err != nil {
 		res.Message = err.Error()
 		return 
 	}
 
-	// fmt.Println(dk)
-	// fmt.Println(&dk)
-	// fmt.Println(*dk)
-
+	// Return result
 	res.Status = true
-	// res.Message = "Data successfully created"
 	res.Message = domain.SuccCreateData
 	res.Data = dk
-	// res.Data = map[string]interface{}{
-	// 	"data": dk,
-	// }
 
 	return
 }

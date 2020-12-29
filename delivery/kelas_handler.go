@@ -19,9 +19,9 @@ type KelasHandler struct {
 	KelasUc domain.KelasUsecase
 }
 
-func NewKelasHandler(e *echo.Echo, du domain.KelasUsecase) {
+func NewKelasHandler(e *echo.Echo, ku domain.KelasUsecase) {
 	handler := &KelasHandler{
-		KelasUc: du,
+		KelasUc: ku,
 	}
 
 	// Using auth
@@ -42,8 +42,8 @@ func (k *KelasHandler) FetchKelas(c echo.Context) error {
 
 	// Panggil fungsi Fetch di usecase kelas
 	res, err := k.KelasUc.Fetch(ctx, cursor, int64(num))
-	fmt.Printf("Handler res: %+v", res)
-	fmt.Println()
+	// fmt.Printf("Handler res: %+v", res)
+	// fmt.Println()
 
 	// Print pretty JSON
 	/*resJSON, err := json.MarshalIndent(res, "", " ")
@@ -64,7 +64,6 @@ func (k *KelasHandler) FetchKelas(c echo.Context) error {
 	fmt.Println()
 
 	if err != nil {
-		// return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		return c.JSON(getStatusCode(err), res)
 	}
 
@@ -100,11 +99,13 @@ func (k *KelasHandler) Store(c echo.Context) (err error) {
 	}
 	fmt.Printf("Marshal function output %s\n", string(resJSON))
 
+	// Validate input
 	var ok bool
 	if ok, err = isRequestKelasValid(&kelas); !ok {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
+	// Insert data
 	ctx := c.Request().Context()
 	res, err := k.KelasUc.Store(ctx, &kelas)
 	fmt.Println("Handler res: ", res)
