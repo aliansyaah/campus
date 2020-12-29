@@ -97,6 +97,43 @@ func isRequestDosenValid(d *domain.Dosen) (bool, error) {
 	return true, nil
 }
 
+func isRequestDosenValidCustom(d *domain.Dosen) (res domain.Response, err error) {
+	validate := validator.New()
+	err = validate.Struct(d)	// validasi struct
+	if err != nil {
+		var pesan []string
+
+		// Looping detail error
+		for _, err := range err.(validator.ValidationErrors){
+			// fmt.Println("Namespace:", err.Namespace())
+			// fmt.Println("Field:", err.Field())
+			// fmt.Println("StructNamespace:", err.StructNamespace())
+			// fmt.Println("StructField:", err.StructField())
+			// fmt.Println("Tag:", err.Tag())
+			// fmt.Println("ActualTag:", err.ActualTag())
+			// fmt.Println("Kind:", err.Kind())
+			// fmt.Println("Type:", err.Type())
+			// fmt.Println("Value:", err.Value())
+			// fmt.Println("Param:", err.Param())
+			// fmt.Println()
+
+			// Coba bikin custom notifikasi error
+			pesan = append(pesan, notifError(err.Field(), err.Tag()))
+		}
+		
+		fmt.Println(pesan)
+		res.Message = "Error validation"
+		res.Data = pesan
+
+		return
+	}
+
+	res.Status = true
+	res.Message = "Validation Ok"
+
+	return
+}
+
 func (d *DosenHandler) Store(c echo.Context) (err error) {
 	var dosen domain.Dosen
 
@@ -107,13 +144,19 @@ func (d *DosenHandler) Store(c echo.Context) (err error) {
 	}
 	fmt.Println(&dosen)
 
-	var ok bool
-	if ok, err = isRequestDosenValid(&dosen); !ok {
-		return c.JSON(http.StatusBadRequest, err.Error())
+	// var ok bool
+	// if ok, err = isRequestDosenValid(&dosen); !ok {
+	// 	return c.JSON(http.StatusBadRequest, err.Error())
+	// }
+
+	// Custom notification validation
+	res, err := isRequestDosenValidCustom(&dosen)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, res)
 	}
 
 	ctx := c.Request().Context()
-	res, err := d.DosenUc.Store(ctx, &dosen)
+	res, err = d.DosenUc.Store(ctx, &dosen)
 	fmt.Println("Handler res: ", res)
 	fmt.Println("Handler err: ", err)
 
@@ -134,14 +177,20 @@ func (d *DosenHandler) Update(c echo.Context) (err error) {
 	}
 	// fmt.Println(&dosen)
 
-	var ok bool
-	if ok, err = isRequestDosenValid(&dosen); !ok {
-		return c.JSON(http.StatusBadRequest, err.Error())
+	// var ok bool
+	// if ok, err = isRequestDosenValid(&dosen); !ok {
+	// 	return c.JSON(http.StatusBadRequest, err.Error())
+	// }
+
+	// Custom notification validation
+	res, err := isRequestDosenValidCustom(&dosen)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, res)
 	}
 	// os.Exit(1)
 
 	ctx := c.Request().Context()
-	res, err := d.DosenUc.Update(ctx, &dosen)
+	res, err = d.DosenUc.Update(ctx, &dosen)
 	fmt.Println("Handler res: ", res)
 	fmt.Println("Handler err: ", err)
 
@@ -150,7 +199,7 @@ func (d *DosenHandler) Update(c echo.Context) (err error) {
 		return c.JSON(getStatusCode(err), res)
 	}
 
-	return c.JSON(http.StatusCreated, res)
+	return c.JSON(http.StatusOK, res)
 }
 
 func (d *DosenHandler) Delete(c echo.Context) error {
