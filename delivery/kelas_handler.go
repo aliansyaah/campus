@@ -80,6 +80,65 @@ func isRequestKelasValid(k *domain.Kelas) (bool, error) {
 	return true, nil
 }
 
+func isRequestKelasValidCustom(d *domain.Kelas) (res domain.Response, err error) {
+	validate := validator.New()
+
+	// Validasi variable
+	err = validate.Var(d.Ruang.ID, "required")
+	if err != nil {
+		fmt.Println(err)
+		res.Message = "ID ruang harus diisi"
+		return 
+	}
+
+	err = validate.Var(d.MataKuliah.ID, "required")
+	if err != nil {
+		fmt.Println(err)
+		res.Message = "ID mata kuliah harus diisi"
+		return 
+	}
+
+	err = validate.Var(d.Dosen.ID, "required")
+	if err != nil {
+		fmt.Println(err)
+		res.Message = "ID dosen harus diisi"
+		return 
+	}
+
+	err = validate.Var(d.Mahasiswa.ID, "required")
+	if err != nil {
+		fmt.Println(err)
+		res.Message = "ID mahasiswa harus diisi"
+		return 
+	}
+
+	// Validasi struct
+	err = validate.Struct(d)
+	if err != nil {
+		var pesan []string
+
+		// Looping detail error
+		for _, err := range err.(validator.ValidationErrors){
+			fmt.Println("Namespace:", err.Namespace())
+			fmt.Println("Field:", err.Field())
+			fmt.Println("Tag:", err.Tag())
+			fmt.Println()
+
+			// Custom error validation notification
+			pesan = append(pesan, validationNotif(err.Namespace(), err.Tag()))
+		}
+		
+		fmt.Println(pesan)
+		res.Message = "Error validation"
+		res.Data = pesan
+		return
+	}
+
+	res.Status = true
+	res.Message = "Validation Ok"
+	return
+}
+
 func (k *KelasHandler) Store(c echo.Context) (err error) {
 	var kelas domain.Kelas
 
@@ -100,14 +159,20 @@ func (k *KelasHandler) Store(c echo.Context) (err error) {
 	fmt.Printf("Marshal function output %s\n", string(resJSON))
 
 	// Validate input
-	var ok bool
-	if ok, err = isRequestKelasValid(&kelas); !ok {
-		return c.JSON(http.StatusBadRequest, err.Error())
+	// var ok bool
+	// if ok, err = isRequestKelasValid(&kelas); !ok {
+	// 	return c.JSON(http.StatusBadRequest, err.Error())
+	// }
+
+	// Custom validate input
+	res, err := isRequestKelasValidCustom(&kelas)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, res)
 	}
 
 	// Insert data
 	ctx := c.Request().Context()
-	res, err := k.KelasUc.Store(ctx, &kelas)
+	res, err = k.KelasUc.Store(ctx, &kelas)
 	fmt.Println("Handler res: ", res)
 	fmt.Println("Handler err: ", err)
 

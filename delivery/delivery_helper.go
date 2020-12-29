@@ -32,10 +32,32 @@ func validationNotif(namespace string, tag string) string {
 	switch {
 		case (namespace == "Mahasiswa.Name"):
 			fieldMessage = "Kolom nama mahasiswa "
-		case (namespace == "Dosen.Name"):
-			fieldMessage = "Kolom nama dosen "
+
 		case (namespace == "Dosen.Nip"):
 			fieldMessage = "Kolom NIP "
+		case (namespace == "Dosen.Name"):
+			fieldMessage = "Kolom nama dosen "
+
+		case (namespace == "Ruang.Name"):
+			fieldMessage = "Kolom nama ruang "
+
+		case (namespace == "MataKuliah.Name"):
+			fieldMessage = "Kolom nama mata kuliah "
+
+		case (namespace == "Kelas.Name"):
+			fieldMessage = "Kolom nama kelas "
+		case (namespace == "Kelas.Ruang.Name"):
+			fieldMessage = "Kolom nama ruang "
+		case (namespace == "Kelas.MataKuliah.Name"):
+			fieldMessage = "Kolom nama mata kuliah "
+		case (namespace == "Kelas.Dosen.Nip"):
+			fieldMessage = "Kolom NIP "
+		case (namespace == "Kelas.Dosen.Name"):
+			fieldMessage = "Kolom nama dosen "
+		case (namespace == "Kelas.Mahasiswa.Name"):
+			fieldMessage = "Kolom nama mahasiswa "
+		case (namespace == "Kelas.CreatedBy"):
+			fieldMessage = "Kolom created by "
 		default:
 			fieldMessage = "(Kolom error tidak terdefinisi) "
 	}

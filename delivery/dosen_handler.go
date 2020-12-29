@@ -149,7 +149,7 @@ func (d *DosenHandler) Store(c echo.Context) (err error) {
 	// 	return c.JSON(http.StatusBadRequest, err.Error())
 	// }
 
-	// Custom notification validation
+	// Custom validate input
 	res, err := isRequestDosenValidCustom(&dosen)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, res)
