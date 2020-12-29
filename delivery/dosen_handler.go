@@ -117,8 +117,8 @@ func isRequestDosenValidCustom(d *domain.Dosen) (res domain.Response, err error)
 			// fmt.Println("Param:", err.Param())
 			// fmt.Println()
 
-			// Coba bikin custom notifikasi error
-			pesan = append(pesan, notifError(err.Field(), err.Tag()))
+			// Custom error validation notification
+			pesan = append(pesan, validationNotif(err.Namespace(), err.Tag()))
 		}
 		
 		fmt.Println(pesan)

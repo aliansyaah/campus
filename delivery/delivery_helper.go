@@ -24,24 +24,32 @@ func getStatusCode(err error) int {
 	}
 }
 
-// Coba bikin custom notifikasi error
-func notifError(field string, tag string) string {
-	var pesan string
+// Custom error validation notification
+func validationNotif(namespace string, tag string) string {
+	var fieldMessage string
+	var tagMessage string
 
 	switch {
-		case (field == "Nama" || field == "Name") && (tag == "required"):
-			pesan = "Kolom nama harus diisi"
-		case (field == "Alamat") && (tag == "required"):
-			pesan = "Kolom alamat harus diisi"
-		case (field == "Telepon") && (tag == "gte"):
-			pesan = "Nomor telepon terlalu pendek"
-		case (field == "Telepon") && (tag == "lte"):
-			pesan = "Nomor telepon terlalu panjang"
-		case (field == "Nip") && (tag == "required"):
-			pesan = "Kolom NIP harus diisi"
+		case (namespace == "Mahasiswa.Name"):
+			fieldMessage = "Kolom nama mahasiswa "
+		case (namespace == "Dosen.Name"):
+			fieldMessage = "Kolom nama dosen "
+		case (namespace == "Dosen.Nip"):
+			fieldMessage = "Kolom NIP "
 		default:
-			pesan = "Pesan error tidak terdefinisi"
+			fieldMessage = "(Kolom error tidak terdefinisi) "
 	}
 
-	return pesan
+	switch {
+		case (tag == "required"):
+			tagMessage = "harus diisi"
+		case (tag == "gte"):
+			tagMessage = "terlalu pendek"
+		case (tag == "lte"):
+			tagMessage = "terlalu panjang"
+		default:
+			tagMessage = "(Tag error tidak terdefinisi)"
+	}
+
+	return fieldMessage+tagMessage
 }
