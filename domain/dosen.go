@@ -12,6 +12,7 @@ type Dosen struct {
 	CreatedAt time.Time `json:"created_at"`
 	// UpdatedAt time.Time `json:"updated_at"`
 	UpdatedAt mysql.NullTime `json:"updated_at"`	// mysql.NullTime handle null possible values
+													// mysql.NullTime type is not actually a time type, but a struct type
 }
 
 // DosenUsecase

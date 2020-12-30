@@ -36,6 +36,11 @@ func (d *dosenUsecase) Fetch(c context.Context, cursor string, num int64) (res d
 
 	if err != nil {
 		nextCursor = ""
+		res.Data = map[string]interface{}{
+			"data": result,
+			"nextCursor": nextCursor,
+		}
+		return
 	}
 
 	res.Status = true
