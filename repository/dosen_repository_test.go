@@ -50,3 +50,110 @@ func TestFetch(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, list, 2)
 }
+
+func TestGetByID(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	rows := sqlmock.NewRows([]string{"id_dosen", "nip", "name", "created_at", "updated_at"}).
+		AddRow(1, 22222, "Nama Dosen 1", time.Now(), time.Now())
+
+	query := "SELECT id_dosen, nip, name, created_at, updated_at FROM dosen WHERE id_dosen = \\?"
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+	d := NewDosenRepository(db)
+
+	num := int64(5)
+	result, err := d.GetByID(context.TODO(), num)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
+
+func TestGetByNIP(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	rows := sqlmock.NewRows([]string{"id_dosen", "nip", "name", "created_at", "updated_at"}).
+		AddRow(1, 22222, "Nama Dosen 1", time.Now(), time.Now())
+
+	query := "SELECT id_dosen, nip, name, created_at, updated_at FROM dosen WHERE nip = \\?"
+
+	mock.ExpectQuery(query).WillReturnRows(rows)
+	d := NewDosenRepository(db)
+
+	num := int32(22222)
+	result, err := d.GetByNIP(context.TODO(), num)
+	// t.Log("err : ", err)
+	// t.Log("result : ", result)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
+
+func TestStore(t *testing.T) {
+	ar := &domain.Dosen{
+		Nip: 22222,
+		Name: "Nama Dosen 2",
+	}
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	query := "INSERT dosen SET nip=\\?, name=\\?, created_at=now()"
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(ar.Nip, ar.Name).WillReturnResult(sqlmock.NewResult(12, 1))
+
+	d := NewDosenRepository(db)
+
+	err = d.Store(context.TODO(), ar)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(12), ar.ID)
+}
+
+func TestUpdate(t *testing.T) {
+	now := mysql.NullTime{Time: time.Now(), Valid: true}
+	ar := &domain.Dosen{
+		ID: 2,
+		Nip: 33333,
+		Name: "Nama Dosen 3",
+		UpdatedAt: now, 
+	}
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	query := "UPDATE dosen SET nip=\\?, name=\\?, updated_at=now() WHERE id_dosen = \\?"
+
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(ar.Nip, ar.Name, ar.ID).WillReturnResult(sqlmock.NewResult(12, 1))
+
+	d := NewDosenRepository(db)
+
+	err = d.Update(context.TODO(), ar)
+	assert.NoError(t, err)
+}
+
+func TestDelete(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	query := "DELETE FROM dosen WHERE id_dosen = \\?"
+
+	prep := mock.ExpectPrepare(query)
+	prep.ExpectExec().WithArgs(12).WillReturnResult(sqlmock.NewResult(12, 1))
+
+	d := NewDosenRepository(db)
+
+	num := int64(12)
+	err = d.Delete(context.TODO(), num)
+	assert.NoError(t, err)
+}
