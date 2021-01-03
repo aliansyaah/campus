@@ -13,8 +13,9 @@ require (
 	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.4.0
-	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
-	golang.org/x/sync v0.0.0-20190423024810-112230192c58
+	github.com/vektra/mockery/v2 v2.5.1 // indirect
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 	gopkg.in/go-playground/validator.v9 v9.31.0
 )

@@ -46,9 +46,9 @@ func TestFetch(t *testing.T) {
 	cursor := EncodeCursor(mockDosen[1].CreatedAt)
 	num := int64(2)
 	list, nextCursor, err := d.Fetch(context.TODO(), cursor, num)
-	assert.NotEmpty(t, nextCursor)
-	assert.NoError(t, err)
-	assert.Len(t, list, 2)
+	assert.NotEmpty(t, nextCursor)	// nextCursor tidak boleh kosong
+	assert.NoError(t, err)			// tidak boleh ada error
+	assert.Len(t, list, 2)			// isi list harus ada 2, krn data yg di-mock di atas ada 2
 }
 
 func TestGetByID(t *testing.T) {
@@ -68,7 +68,7 @@ func TestGetByID(t *testing.T) {
 	num := int64(5)
 	result, err := d.GetByID(context.TODO(), num)
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
+	assert.NotNil(t, result)	// result tidak boleh nil
 }
 
 func TestGetByNIP(t *testing.T) {
