@@ -106,7 +106,7 @@ func TestGetByID(t *testing.T) {
 	})
 }
 
-/*func TestStore(t *testing.T) {
+func TestStore(t *testing.T) {
 	mockDosenRepo := new(mocks.DosenRepository)
 	mockDosen := domain.Dosen{
 		Nip:	22222,
@@ -131,7 +131,7 @@ func TestGetByID(t *testing.T) {
 		assert.Equal(t, mockDosen.Nip, tempMockDosen.Nip)
 		mockDosenRepo.AssertExpectations(t)
 	})
-}*/
+}
 
 func TestUpdate(t *testing.T) {
 	mockDosenRepo := new(mocks.DosenRepository)
@@ -155,3 +155,47 @@ func TestUpdate(t *testing.T) {
 		mockDosenRepo.AssertExpectations(t)
 	})
 }
+
+/*func TestDelete(t *testing.T) {
+	mockDosenRepo := new(mocks.DosenRepository)
+	mockDosen := domain.Dosen{
+		Nip:	22222,
+		Name:	"Billy",
+	}
+
+	t.Run("success", func(t *testing.T) {
+		mockDosenRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(mockDosen, nil).Once()
+		mockDosenRepo.On("Delete", mock.Anything, mock.AnythingOfType("int64")).Return(nil).Once()
+
+		u := NewDosenUsecase(mockDosenRepo, time.Second*2)
+		res, err := u.Delete(context.TODO(), mockDosen.ID)
+
+		t.Log("res : ", res)
+
+		assert.NoError(t, err)
+		mockDosenRepo.AssertExpectations(t)
+	})
+	t.Run("dosen-is-not-exist", func(t *testing.T) {
+		mockDosenRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(domain.Dosen{}, nil).Once()
+
+		u := NewDosenUsecase(mockDosenRepo, time.Second*2)
+		res, err := u.Delete(context.TODO(), mockDosen.ID)
+
+		t.Log("res : ", res)
+
+		assert.NoError(t, err)
+		mockDosenRepo.AssertExpectations(t)
+	})
+	t.Run("error-happens-in-db", func(t *testing.T) {
+		mockDosenRepo.On("GetByID", mock.Anything, 
+			mock.AnythingOfType("int64")).Return(domain.Dosen{}, errors.New("Unexpexted Error")).Once()
+
+		u := NewDosenUsecase(mockDosenRepo, time.Second*2)
+		res, err := u.Delete(context.TODO(), mockDosen.ID)
+
+		t.Log("res : ", res)
+
+		assert.NoError(t, err)
+		mockDosenRepo.AssertExpectations(t)
+	})
+}*/
